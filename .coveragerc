@@ -1,0 +1,6 @@
+[run]
+source = eve_multitool
+omit = 
+    tests/*
+    autoapp.py
+

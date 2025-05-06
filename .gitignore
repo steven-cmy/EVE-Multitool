@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+bin/
 develop-eggs/
 dist/
 downloads/
@@ -65,11 +66,22 @@ db.sqlite3-journal
 instance/
 .webassets-cache
 
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Complexity
+output/*.html
+output/*/index.html
+
 # Scrapy stuff:
 .scrapy
 
 # Sphinx documentation
 docs/_build/
+
+.webassets-cache
 
 # PyBuilder
 .pybuilder/
@@ -151,6 +163,12 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+# npm
+/node_modules/
+
+# webpack-built files
+/app/static/build/
+
 # Pyre type checker
 .pyre/
 
@@ -172,3 +190,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Development database
+*.db
