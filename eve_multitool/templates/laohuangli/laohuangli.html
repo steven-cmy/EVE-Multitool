@@ -1,8 +1,58 @@
-
-{% extends "layout.html" %}
-{% block content %}
-    <div class="container">
-        <h1>This is the laohuangli page.</h1>
-    </div>
+{% extends "layout.html" %} {% block content %}
+<div class="container">
+    <table>
+        <thead>
+            <tr>
+                <th>{{ context.time }}<br />{{ context.now }}</th>
+                <th>{{ context.date }}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>宜</td>
+                <td>{{ context.today }}</td>
+                <td>忌</td>
+            </tr>
+            <tr>
+                <td>
+                    今日：{% if context.day_recommends|length >0 %}
+                    {% for dr in context.day_recommends %}
+                    {{dr}}
+                    {% endfor %}
+                    {%else%}
+                    -
+                    {%endif%}<br>
+                    时辰：{% if context.hour_recommends|length >0 %}
+                    {% for hr in context.hour_recommends %}
+                    {{hr}}
+                    {% endfor %}
+                    {%else%}
+                    -
+                    {%endif%}
+                </td>
+                <td>{{ context.luck }}</td>
+                <td>今日：{% if context.day_avoids|length >0 %}
+                    {% for da in context.day_avoids %}
+                    {{da}}
+                    {% endfor %}
+                    {%else%}
+                    -
+                    {%endif%}<br>
+                    时辰：{% if context.hour_avoids|length >0 %}
+                    {% for ha in context.hour_avoids %}
+                    {{ha}}
+                    {% endfor %}
+                    {%else%}
+                    -
+                    {%endif%}</td>
+            </tr>
+            <tr>
+                <td><b>今日会战地点：</b><br />{{ context.battle_location }}</td>
+                <td><b>今日幸运舰船：</b><br />{{ context.lucky_ship }}</td>
+                <td><b>今日幸运星域：</b><br />{{ context.lucky_region }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 {% endblock %}
-
