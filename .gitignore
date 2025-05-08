@@ -168,6 +168,7 @@ dmypy.json
 
 # webpack-built files
 /app/static/build/
+cache_manifest.json
 
 # Pyre type checker
 .pyre/
