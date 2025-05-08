@@ -4,7 +4,11 @@
 from flask import Blueprint, render_template
 
 blueprint = Blueprint(
-    "laohuangli", __name__, url_prefix="/lhl", static_folder="../static"
+    "laohuangli",
+    __name__,
+    url_prefix="/lhl",
+    static_folder="../static",
+    template_folder="./templates",
 )
 
 
@@ -32,4 +36,4 @@ def laohuangli():
     #     "lucky_region": "",
     #     "direction": today.get_jupiter_direction().get_name(),
     # }
-    return render_template("laohuangli/laohuangli.html")
+    return render_template("laohuangli.html")
