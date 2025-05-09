@@ -18,7 +18,7 @@ RUN pip install --no-cache -r requirements/prod.txt
 COPY package.json ./
 RUN npm install
 
-COPY webpack.config.js autoapp.py ./
+COPY webpack.config.js tsconfig.json autoapp.py ./
 COPY eve_multitool eve_multitool
 COPY assets assets
 COPY .env.example .env

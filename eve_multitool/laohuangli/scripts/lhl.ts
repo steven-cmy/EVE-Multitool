@@ -1,15 +1,27 @@
-import { SixtyCycleDay, SixtyCycleHour, SolarTime } from 'tyme4ts';
+import { SixtyCycleDay, SixtyCycleHour, SolarTime, Taboo } from 'tyme4ts';
 interface ElementUpdate {
     id: string;
-    textContent: string;
+    content: string;
 }
 
-function tabooTranslate(): string {
-    return ""
+function tabooTranslate(taboo_list: Array<Taboo>): string {
+    let text: string = "-"
+    const dictionary: { [key: string]: string } = {
+        "": ""
+    };
+    if (Array.isArray(taboo_list) && taboo_list.length > 0) {
+        text = text.replace("-", "")
+        taboo_list.forEach(function (t) {
+            if (t instanceof Taboo) {
+                text = text.concat((dictionary[t.getName()] || t.getName()), " ");
+            }
+        })
+    }
+    return text
 }
 
 
-function update(id: string, t: string): void {
+function update(id: string, t: ElementUpdate["content"]): void {
     const e = document.getElementById(id);
     if (e) {
         e.textContent = t;
@@ -18,29 +30,30 @@ function update(id: string, t: string): void {
 
 function updateAll(): void {
     let d = new Date();
-    let local_time: SolarTime = SolarTime.fromYmdHms(d.getFullYear(), d.getMonth(), d.getDay(), d.getHours(), d.getMinutes(), d.getSeconds());
-    let now: SixtyCycleHour = local_time.getSixtyCycleHour()
-    let today: SixtyCycleDay = local_time.getSolarDay().getSixtyCycleDay()
-    console.log(now.toString())
+    let now: SolarTime = SolarTime.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds());
+    let hour: SixtyCycleHour = now.getSixtyCycleHour()
+    let day: SixtyCycleDay = now.getSolarDay().getSixtyCycleDay()
+    console.log(d.toString(), hour.toString())
 
     const elementsToUpdate: ElementUpdate[] = [
-        { id: 'time', textContent: now.getSolarTime().getName() },
-        { id: 'hour', textContent: now.getName() },
-        { id: 'yearmonth', textContent: today.getSolarDay().get },
-        { id: 'day', textContent: today.getSolarDay().getDay().toString() },
-        { id: 'today', textContent: today.getName() },
-        // { id: 'day_recommends', textContent: today.getRecommends(). },
-        // { id: 'hour_recommends', textContent: now.getName() },
-        { id: 'luck', textContent: today.getSolarDay().getLunarDay().getMinorRen().getLuck().getName() },
-        // { id: 'day_avoids', textContent: now.getName() },
-        // { id: 'hour_avoids', textContent: now.getName() },
-        { id: 'battle_location', textContent: "-" },
-        { id: 'lucky_ship', textContent: "-" },
-        { id: 'lucky_region', textContent: "-" },
+        { id: 'time', content: hour.getSolarTime().getName() },
+        { id: 'ttime', content: hour.getName() },
+        { id: 'yearmonth', content: day.getSolarDay().getSolarMonth().getSolarYear().getName() + day.getSolarDay().getSolarMonth().getName() },
+        { id: 'tyearmonth', content: day.getYear().getName() + "年" + day.getMonth().getName() + "月" },
+        { id: 'date', content: day.getSolarDay().getName() },
+        { id: 'tdate', content: day.getName() },
+        { id: 'day_recommends', content: tabooTranslate(day.getRecommends()) },
+        { id: 'hour_recommends', content: tabooTranslate(hour.getRecommends()) },
+        { id: 'luck', content: day.getSolarDay().getLunarDay().getMinorRen().getLuck().getName() },
+        { id: 'day_avoids', content: tabooTranslate(day.getAvoids()) },
+        { id: 'hour_avoids', content: tabooTranslate(hour.getAvoids()) },
+        { id: 'battle_location', content: "-" },
+        { id: 'lucky_ship', content: "-" },
+        { id: 'lucky_region', content: "-" },
     ];
 
     elementsToUpdate.forEach(element => {
-        update(element.id, element.textContent)
+        update(element.id, element.content)
     })
 }
 
