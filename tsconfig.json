@@ -9,6 +9,6 @@
         "strict": true
     },
     "include": [
-        "eve_multitool/*/scripts/*"
+        "eve_multitool/*/assets/**/*"
     ]
 }

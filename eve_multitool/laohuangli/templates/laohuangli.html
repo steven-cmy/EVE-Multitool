@@ -10,16 +10,15 @@
         </thead>
         <tbody>
             <tr>
-                <td>宜</td>
-                <td><span id="luck">...</span></td>
-                <td>忌</td>
+                <td><b>宜</b></td>
+                <td rowspan="2"><span id="luck">...</span></td>
+                <td><b>忌</b></td>
             </tr>
             <tr>
                 <td>
                     今日：<span id="day_recommends">...</span><br>
                     时辰：<span id="hour_recommends">...</span>
                 </td>
-                <td></td>
                 <td>
                     今日：<span id="day_avoids">...</span><br>
                     时辰：<span id="hour_avoids">...</span>
@@ -33,6 +32,10 @@
         </tbody>
     </table>
 </div>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ static_url_for('static', filename='build/lhl_css.bundle.css') }}" />
 {% endblock %}
 
 {% block js %}

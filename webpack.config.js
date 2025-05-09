@@ -26,7 +26,7 @@ module.exports = {
   entry: {
     // Dynamic discovery of JS and TS files in scripts directories
     ...glob
-      .sync("./eve_multitool/*/scripts/*.{ts,js}")
+      .sync("./eve_multitool/*/assets/**/*.{ts,js,css}")
       .reduce((acc, filePath) => {
         const filename = path.basename(filePath);
         const ext = path.extname(filePath).slice(1);

@@ -1,0 +1,30 @@
+/* =============================================================================
+   Laohuangli CSS file.
+   ========================================================================== */
+
+.good {
+  color: green;
+}
+
+.bad {
+  color: darkred;
+}
+
+#laohuangli {
+  text-align: center;
+  height: 100%;
+  width: 100%;
+  table-layout: fixed;
+  border: 3px solid black;
+}
+
+#laohuangli>thead>tr>th,
+#laohuangli>tbody>tr>td {
+  border-width: 1px;
+  padding: 5px;
+}
+
+#luck {
+  font-size: xx-large;
+  font-weight: bolder;
+}
