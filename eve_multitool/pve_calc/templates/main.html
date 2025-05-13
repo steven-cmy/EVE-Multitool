@@ -1,0 +1,149 @@
+{% extends "layout.html" %} {% block content %}
+<div class="container" id="app">
+    <h1>PvE分成计算器</h1>
+    <form>
+        <div class="row">
+            <div class="col-4">
+                <label for="override-value" class="form-label">总收入</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">ISK</div>
+                    </div>
+                    <input type="number" class="form-control text-end ISK" id="override-value" placeholder="覆盖收入">
+                </div>
+                <hr>
+                <label for="loot" class="form-label">掉落</label>
+                <textarea class="form-control" id="loot" rows="3" placeholder="粘贴至此..."></textarea>
+            </div>
+
+            <div class="col-8">
+                <table class="table align-middle table-hover" id="players">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <label for="start-time">
+                                开始时间：
+                            </label>
+                            <input id="start-time" type="time" name="start-time" />
+                            <label for="end-time">
+                                结束时间：
+                            </label>
+                            <input id="end-time" type="time" name="end-time" />
+                        </div>
+                        <div><i class="ms-4 fa-solid fa-minus clickable" id="remove-entry"></i><i
+                                class="ms-4 fa-solid fa-plus clickable" id="add-entry"></i></div>
+                    </div>
+                    <thead>
+                        <tr>
+                            <th class="col-3" scope="col">参与者</th>
+                            <th class="col-1" scope="col">人数</th>
+                            <th class="col-1" scope="col">系数</th>
+                            <th class="col-1" scope="col">点/轮数</th>
+                            <th class="col-3" scope="col">分成</th>
+                            <th class="col-3" scope="col">ISK每小时</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="1">
+                            <th scope="row"><input class="w-100 playerName" type="text" placeholder="ID/职务">
+                            </th>
+                            <td><input class="w-100 counts" type="number" min="1" value=1></td>
+                            <td><input class="w-100 weight" type="number" min="0.1" step="0.1" value=1></td>
+                            <td><input class="w-100 runs" type="number" min="1" value=1></td>
+                            <td>
+                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                        class="copyable ISK share" data-true-value="0">...</span></div>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                        class="copyable ISK iph" data-true-value="0">...</span></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th scope="row">总计<span class="fw-normal">（耗时 <span id="total-time">00:00</span>）</span>
+                            </th>
+                            <td>
+                                <div class="w-100 text-center"><span id="total-counts">1</span>人</div>
+                            </td>
+                            <td>
+                                <div class="w-100 text-center"><span id="total-runs">1</span>点/轮</div>
+                            </td>
+                            <th scope="row">平均</th>
+                            <td>
+                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                        class="copyable ISK" id="avg-share" data-true-value="0">...</span></div>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                        class="copyable ISK" id="avg-iph" data-true-value="0">...</span></div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="separator mt-5">结算</div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between">
+                            <span>毛利润</span>
+                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                    class="copyable ISK" id="gross-value" data-true-value="0">...</span></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between">
+                            <span>额外开销</span>
+                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                    class="copyable ISK" id="total-cost" data-true-value="0">...</span></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex justify-content-between">
+                            <span>销售税<i class="text-body-tertiary" id="sales-tax-percetage">(7.50%)</i></span>
+                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                    class="copyable ISK" id="sales-tax" data-true-value="0">...</span></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex justify-content-between">
+                            <span>公司税<i class="text-body-tertiary" id="corp-tax-percentage">(0.00%)</i></span>
+                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                    class="copyable ISK" id="corp-tax" data-true-value="0">...</span></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between">
+                            <span>净利润</span>
+                            <div class="d-flex justify-content-between fw-bold"><span class="me-1">ISK</span><span
+                                    class="copyable ISK" id="net-value" data-true-value="0">...</span></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between">
+                            <span>平均每点/轮净利润</span>
+                            <div class="d-flex justify-content-between"><span class="text-nowrap">（耗时 <span id="time-per-run"> 00:00</span>）</span><span class="me-1">ISK</span><span
+                                    class="copyable ISK" id="avg-per-run" data-true-value="0">...</span></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between">
+                            <span>总ISK每小时</span>
+                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                    class="copyable ISK" id="total-iph" data-true-value="0">...</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ static_url_for('static', filename='build/pve_css.bundle.css') }}" />
+{% endblock %}
+
+{% block js %}
+<script src="{{ static_url_for('static', filename='build/simple_cookie_ts.bundle.js') }}"></script>
+<script src="{{ static_url_for('static', filename='build/pve_ts.bundle.js') }}"></script>
+{% endblock %}

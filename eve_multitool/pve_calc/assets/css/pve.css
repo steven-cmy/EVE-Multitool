@@ -1,0 +1,58 @@
+.copyable {
+    cursor: copy;
+}
+
+.copyable.disabled {
+    cursor: default;
+}
+
+.fa-solid {
+    align-content: center;
+}
+
+.fa-solid.clickable {
+    cursor: pointer;
+}
+
+.fa-solid.disabled {
+    cursor: not-allowed;
+    color: grey;
+}
+
+.input-group-text {
+    border-top-right-radius: 0%;
+    border-bottom-right-radius: 0%;
+}
+
+.ISK::-webkit-outer-spin-button,
+.ISK::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.ISK {
+    -moz-appearance: textfield;
+    text-align: end;
+    min-width: 10%;
+}
+
+.separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.separator::before,
+.separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #000;
+}
+
+.separator:not(:empty)::before {
+    margin-right: .25em;
+}
+
+.separator:not(:empty)::after {
+    margin-left: .25em;
+}
