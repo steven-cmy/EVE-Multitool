@@ -3,30 +3,58 @@
     <h1>PvE分成计算器</h1>
     <form>
         <div class="row">
-            <div class="col-4">
+            <div class="col-5">
                 <fieldset class="rounded border p-2">
                     <legend class="float-none w-auto p-2">收入</legend>
-                    <div class="input-group">
+                    <div class="input-group mb-4">
                         <div class="input-group-prepend">
                             <div class="input-group-text">ISK</div>
                         </div>
-                        <input type="number" class="form-control text-end ISK" id="override-value" placeholder="覆盖收入">
+                        <input type="number" class="form-control text-end ISK" id="income-value" placeholder="ISK收入">
                     </div>
                     <label for="loot" class="form-label">掉落</label>
                     <textarea class="form-control" id="loot" rows="3" placeholder="粘贴至此..."></textarea>
                 </fieldset>
                 <fieldset class="rounded border p-2">
                     <legend class="float-none w-auto p-2">支出</legend>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">ISK</div>
+                    <div class="row">
+                        <div class="col-2 mb-4">纤维：</div>
+                        <div class="col-4"><select name="abyssal-level" id="abyssal-level">
+                                <option value=0>T0 - Tranquil</option>
+                                <option value=1>T1 - Calm</option>
+                                <option value=2>T2 - Agitated</option>
+                                <option value=3>T3 - Fierce</option>
+                                <option value=4>T4 - Raging</option>
+                                <option value=5>T5 - Chaotic</option>
+                                <option value=6>T6 - Cataclysmic</option>
+                            </select></div>
+                        <div class="col-4"><select name="abyssal-weather" id="abyssal-weather">
+                                <option value="Electrical">Electrical</option>
+                                <option value="Dark">Dark</option>
+                                <option value="Exotic">Exotic</option>
+                                <option value="Firestorm">Firestorm</option>
+                                <option value="Gamma">Gamma</option>
+                            </select></div>
+                        <div class="col-2"><span class="d-flex justify-content-end ms-1">x<input id="filament-count"
+                                    class="w-100 ms-1" type="number" min=0 step=1 value=0></span></div>
+                        <div class="col-6"></div>
+                        <div class="col-6 mb-4">
+                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                    class="copyable ISK" id="filament-cost" data-true-value="0">...</span></div>
                         </div>
-                        <input type="number" class="form-control text-end ISK" id="other-cost" placeholder="其他支出">
-                    </div>
+                        <div class="col-12">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">ISK</div>
+                                </div>
+                                <input type="number" class="form-control text-end ISK" id="other-cost"
+                                    placeholder="ISK支出">
+                            </div>
+                        </div>
                 </fieldset>
             </div>
 
-            <div class="col-8">
+            <div class="col-7">
                 <table class="table align-middle table-hover" id="players">
                     <div class="d-flex justify-content-between">
                         <div>
