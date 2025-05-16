@@ -7,27 +7,14 @@ interface ElementUpdate {
 }
 
 const corp_tax_rate: number = +(Cookies.get('corp-tax-rate') ?? 0);
-const sales_tax_rate: number = +(Cookies.get('sales-tax-rate') ?? 0.075);
+const sales_tax_rate: number = (0.075 * (1 - (0.11 * +(Cookies.get('accounting-skill-level') ?? 0))));
 
 const time2min = (s: string) => s.split(":").reduce((acc, curr) => acc * 60 + +curr, 0);
 const min2time = (m: number) => `${Number.isInteger(m) ? ' ' : '~'}${String(Math.floor(m / 60)).padStart(2, '0')}:${String(Math.round(m) % 60).padStart(2, '0')}`;
 
-function addRow(table: HTMLTableElement) {
-    const tbody = table.getElementsByTagName('tbody')[0];
-    const rows = tbody.getElementsByTagName('tr');
-    const i = rows.length;
-    var row = tbody.insertRow();
-    row.innerHTML = rows[i - 1].innerHTML;
-    row.id = (i + 1).toString();
-}
-
-function addRowListener() {
-    const t = document.getElementById('players') as HTMLTableElement;
-    addRow(t);
-    update();
-}
-
 function calculate() {
+    $("#corp-tax-percetage").text("(" + corp_tax_rate.toLocaleString('en', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ")");
+    $("#sales-tax-percetage").text("(" + sales_tax_rate.toLocaleString('en', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ")");
     const table = document.getElementById('players') as HTMLTableElement;
     const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
     const total_mins = time2min(document.getElementById('total-time')?.textContent ?? "00:00")
@@ -64,6 +51,7 @@ function calculate() {
 
     const elementsToUpdate: ElementUpdate[] = [
         { id: 'gross-value', value: total_value },
+        { id: 'total-cost', value: total_cost },
         { id: 'sales-tax', value: sales_tax },
         { id: 'corp-tax', value: corp_tax },
         { id: 'net-value', value: net_value },
@@ -72,12 +60,7 @@ function calculate() {
         { id: 'avg-iph', value: total_iphs / rows.length },
         { id: 'total-iph', value: total_mins > 0 ? net_value / (total_mins / 60) : 0 },
     ];
-    elementsToUpdate.forEach(element => {
-        const e = document.getElementById(element.id);
-        if (e) {
-            e.setAttribute('data-true-value', element.value.toString())
-        }
-    });
+    elementsToUpdate.forEach(element => { $(`#${element.id}`).attr('data-true-value', element.value.toString()); });
 
 }
 
@@ -95,22 +78,6 @@ function copyToClipboard(e: Element) {
             e.classList.remove('text-danger');
         }, 2000);
     });
-}
-
-function deleteRow(table: HTMLTableElement, row_num?: number) {
-    const tbody = table.getElementsByTagName('tbody')[0];
-    const rows = tbody.getElementsByTagName('tr');
-    var id = rows.length
-    if (typeof row_num !== 'undefined') {
-        id = row_num;
-    }
-    tbody.removeChild(table.getElementsByTagName('tr')[id]);
-}
-
-function deleteRowListener() {
-    const t = document.getElementById('players') as HTMLTableElement;
-    deleteRow(t);
-    update();
 }
 
 function fillISk(e: Element, value?: number) {
@@ -137,11 +104,11 @@ function fillISk(e: Element, value?: number) {
 }
 
 function getTotalCost(): number {
-    return 0
+    return +($("#other-cost").val() ?? 0) || 0
 }
 
 function getTotalValue(): number {
-    return (document.getElementById('override-value') as HTMLInputElement).valueAsNumber || 0
+    return +($("#override-value").val() ?? 0) || 0
 }
 
 function getValue(e: Element | null): number {
@@ -150,22 +117,9 @@ function getValue(e: Element | null): number {
 }
 
 function update() {
-    const app = document.getElementById('app');
-    if (app) {
-        const monitorUpdate = [
-            app.getElementsByTagName('input'),
-            app.getElementsByTagName('textarea'),
-            app.getElementsByTagName('select')
-        ]
-        monitorUpdate.forEach((collection) => {
-            for (let i = 0; i < collection.length; i++) {
-                const element = collection[i];
-                element.addEventListener('change', () => {
-                    update();
-                });
-            }
-        });
-    }
+    $("input").each(function () { const input = $(this); input.off('change'); input.on('change', () => { update() }) });
+    $("textarea").each(function () { const textarea = $(this); textarea.off('change'); textarea.on('change', () => { update() }) });
+    $("select").each(function () { const select = $(this); select.off('change'); select.on('change', () => { update() }) });
 
     const t = document.getElementById('players') as HTMLTableElement;
     updateTable(t);
@@ -175,42 +129,41 @@ function update() {
 }
 
 function updateISKs() {
-    const ISKs = document.getElementsByClassName("ISK");
-    for (let i = 0; i < ISKs.length; i++) {
-        const isk = ISKs[i];
-        fillISk(isk);
-        if (isk.classList.contains('copyable')) {
-            const value: number = getValue(isk);
-            isk.classList.add('disabled')
+    $(".ISK").each(function () {
+        const isk = $(this);
+        fillISk(this);
+        const value: number = getValue(this);
+        if (isk.hasClass('copyable')) {
+            isk.removeClass('disabled');
             if (value !== 0) {
-                isk.classList.remove('disabled')
-                isk.on('click', copyToClipboard(isk))
-                // isk.addEventListener('click', () => {
-                //     copyToClipboard(isk);
-                // });
+                isk.removeClass('disabled');
+                isk.on('click', () => copyToClipboard(this));
             } else {
-                isk.classList.add('disabled')
+                isk.addClass('disabled');
+                isk.off('click');
             }
         }
-    }
+    });
 }
 
 function updateTable(table: HTMLTableElement) {
     const limit = 10;
-    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-    const minus_button = document.getElementById('remove-entry');
-    const add_button = document.getElementById('add-entry');
-    minus_button?.classList.replace('clickable', 'disabled');
-    minus_button?.removeEventListener('click', deleteRowListener);
-    add_button?.classList.replace('clickable', 'disabled');
-    add_button?.removeEventListener('click', addRowListener);
-    if (rows.length > 1) {
-        minus_button?.classList.replace('disabled', 'clickable');
-        minus_button?.addEventListener('click', deleteRowListener);
+
+    $("#remove-entry").off('click').removeClass('clickable').addClass('disabled');
+    $("#add-entry").off('click').removeClass('clickable').addClass('disabled');
+    if ($("#players>tbody>tr").length > 1) {
+        $("#remove-entry").addClass('clickable').removeClass('disabled');
+        $("#remove-entry").on('click', function () {
+            $("#players>tbody").children().last().remove();
+            update();
+        });
     }
-    if (rows.length < limit) {
-        add_button?.classList.replace('disabled', 'clickable');
-        add_button?.addEventListener('click', addRowListener);
+    if ($("#players>tbody>tr").length < limit) {
+        $("#add-entry").addClass('clickable').removeClass('disabled');
+        $("#add-entry").on('click', function () {
+            $("#players>tbody").children().last().clone().attr("id", $("#players>tbody").children().length + 1).insertAfter($("#players>tbody").children().last());
+            update();
+        });
     }
 
     const tStart = time2min((document.getElementById('start-time') as HTMLInputElement).value);
@@ -220,7 +173,7 @@ function updateTable(table: HTMLTableElement) {
     var total_count = 0, total_runs = 0;
     const counts = table.getElementsByTagName('tbody')[0].getElementsByClassName('counts');
     const runs = table.getElementsByTagName('tbody')[0].getElementsByClassName('runs');
-    for (let i = 0; i < rows.length; i++) {
+    for (let i = 0; i < $("#players>tbody>tr").length; i++) {
         total_count += (counts[i] as HTMLInputElement).valueAsNumber;
         total_runs = Math.max(total_runs, (runs[i] as HTMLInputElement).valueAsNumber);
     }
@@ -232,4 +185,5 @@ function updateTable(table: HTMLTableElement) {
 
 $(function () {
     update();
+    $("#loot").attr("placeholder", "暂不支持！");
 });

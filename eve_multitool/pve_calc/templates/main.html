@@ -4,16 +4,26 @@
     <form>
         <div class="row">
             <div class="col-4">
-                <label for="override-value" class="form-label">总收入</label>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <div class="input-group-text">ISK</div>
+                <fieldset class="rounded border p-2">
+                    <legend class="float-none w-auto p-2">收入</legend>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">ISK</div>
+                        </div>
+                        <input type="number" class="form-control text-end ISK" id="override-value" placeholder="覆盖收入">
                     </div>
-                    <input type="number" class="form-control text-end ISK" id="override-value" placeholder="覆盖收入">
-                </div>
-                <hr>
-                <label for="loot" class="form-label">掉落</label>
-                <textarea class="form-control" id="loot" rows="3" placeholder="粘贴至此..."></textarea>
+                    <label for="loot" class="form-label">掉落</label>
+                    <textarea class="form-control" id="loot" rows="3" placeholder="粘贴至此..."></textarea>
+                </fieldset>
+                <fieldset class="rounded border p-2">
+                    <legend class="float-none w-auto p-2">支出</legend>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">ISK</div>
+                        </div>
+                        <input type="number" class="form-control text-end ISK" id="other-cost" placeholder="其他支出">
+                    </div>
+                </fieldset>
             </div>
 
             <div class="col-8">
@@ -99,7 +109,7 @@
                     </div>
                     <div class="col-6">
                         <div class="d-flex justify-content-between">
-                            <span>销售税<i class="text-body-tertiary" id="sales-tax-percetage">(7.50%)</i></span>
+                            <span>销售税<i class="text-body-tertiary" id="sales-tax-percetage">(0.00%)</i></span>
                             <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
                                     class="copyable ISK" id="sales-tax" data-true-value="0">...</span></div>
                         </div>
@@ -121,7 +131,8 @@
                     <div class="col-12">
                         <div class="d-flex justify-content-between">
                             <span>平均每点/轮净利润</span>
-                            <div class="d-flex justify-content-between"><span class="text-nowrap">（耗时 <span id="time-per-run"> 00:00</span>）</span><span class="me-1">ISK</span><span
+                            <div class="d-flex justify-content-between"><span class="text-nowrap">（耗时 <span
+                                        id="time-per-run"> 00:00</span>）</span><span class="me-1">ISK</span><span
                                     class="copyable ISK" id="avg-per-run" data-true-value="0">...</span></div>
                         </div>
                     </div>
@@ -144,6 +155,5 @@
 {% endblock %}
 
 {% block js %}
-<script src="{{ static_url_for('static', filename='build/simple_cookie_ts.bundle.js') }}"></script>
 <script src="{{ static_url_for('static', filename='build/pve_ts.bundle.js') }}"></script>
 {% endblock %}
