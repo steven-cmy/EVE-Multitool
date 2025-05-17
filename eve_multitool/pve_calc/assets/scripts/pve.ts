@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie';
 import $ from "jquery";
+const bootstrap = require("bootstrap");
 
 interface ElementUpdate {
     id: string;
@@ -13,11 +14,9 @@ interface FilamentPrice {
 }
 
 const corp_tax_rate: number = +(Cookies.get('corp-tax-rate') ?? 0);
-const sales_tax_rate: number = (0.075 * (1 - (0.11 * +(Cookies.get('accounting-skill-level') ?? 0))));
+const sales_tax_rate: number = (0.075 * (1 - (0.11 * +(Cookies.get('accounting-skill-level') ?? 5))));
 
-var filamentPrices: FilamentPrice[] = loadFromLS('filament-prices') ?? []
-
-
+var filamentPrices: FilamentPrice[] = loadFromLS('filament-prices') ?? [];
 
 const time2min = (s: string) => s.split(":").reduce((acc, curr) => acc * 60 + +curr, 0);
 const min2time = (m: number) => `${Number.isInteger(m) ? ' ' : '~'}${String(Math.floor(m / 60)).padStart(2, '0')}:${String(Math.round(m) % 60).padStart(2, '0')}`;
@@ -26,13 +25,20 @@ function calculate() {
     $("#corp-tax-percetage").text("(" + corp_tax_rate.toLocaleString('en', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ")");
     $("#sales-tax-percetage").text("(" + sales_tax_rate.toLocaleString('en', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ")");
     const total_mins = time2min($("#total-time").text() || "00:00");
-    const total_count = +($("#total-counts").text())
-    const total_runs = +($("#total-runs").text())
+    const total_count = +($("#total-counts").text());
+    const total_runs = +($("#total-runs").text());
     const total_value = getTotalValue();
     const total_cost = getTotalCost();
     const sales_tax = total_value * sales_tax_rate;
     const corp_tax = (total_value - sales_tax) * corp_tax_rate;
     const net_value = total_value - total_cost - sales_tax - corp_tax;
+    const filament_count = +($("#filament-count").val() ?? 0);
+    const expect_filament = total_count * total_runs;
+    if (filament_count > 0 && filament_count !== expect_filament) {
+        $("#filament-count").attr("data-bs-toggle", "tooltip").addClass("border-danger");
+    } else {
+        $("#filament-count").removeAttr("data-bs-toggle").removeClass("border-danger");
+    }
 
     var adjusted_weights: number[] = [], total_iphs = 0;
     $("#players>tbody>tr").each(function (i) { adjusted_weights[i] = (+($(this).find(".runs").val() ?? 0) / total_runs) * +($(this).find(".weight").val() ?? 0); });
@@ -104,11 +110,11 @@ function fillISk(e: Element, value?: number) {
 }
 
 function getTotalCost(): number {
-    return +($("#other-cost").val() ?? 0) + 0 || 0
+    return +($("#other-cost").val() ?? 0) + 0 || 0;
 }
 
 function getTotalValue(): number {
-    return +($("#income-value").val() ?? 0) + 0 || 0
+    return +($("#income-value").val() ?? 0) + 0 || 0;
 }
 
 function loadFromLS(key: string): any | null {
@@ -120,7 +126,7 @@ function loadFromLS(key: string): any | null {
         localStorage.removeItem(key);
         return null;
     }
-    return parsed.data
+    return parsed.data;
 }
 
 function update() {
@@ -130,6 +136,8 @@ function update() {
     updateTable();
     calculate();
     updateISKs();
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = Array.from(tooltipTriggerList).map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
 function updateISKs() {
@@ -148,10 +156,10 @@ function updateISKs() {
 
 function updatePrice() {
     $("#abyssal-level>option").each(function () {
-        const tier = $(this).text().split(" - ")[1] + " "
+        const tier = $(this).text().split(" - ")[1] + " ";
         $("#abyssal-weather>option").each(function () {
-            const n = tier + $(this).text() + " Filament"
-            filamentPrices.push({ name: n })
+            const n = tier + $(this).text() + " Filament";
+            filamentPrices.push({ name: n });
         });
     });
     $.post(
@@ -159,14 +167,14 @@ function updatePrice() {
         JSON.stringify(filamentPrices.map(item => item.name))
     ).done(function (data) {
         data.inventory_types.forEach((type: any) => {
-            const entry = filamentPrices.find(item => item.name === type.name)
+            const entry = filamentPrices.find(item => item.name === type.name);
             if (entry) { entry.id = type.id; }
         });
         $.get(
             `https://market.fuzzwork.co.uk/aggregates/?region=10000002&types=${filamentPrices.map(item => item.id).filter(id => id !== undefined).join(",")}`
             , function (data) {
                 Object.entries(data).forEach(([key, value]) => {
-                    const entry = filamentPrices.find(item => item.id === +(key))
+                    const entry = filamentPrices.find(item => item.id === +(key));
                     if (entry) { entry.price = value; }
                 });
                 saveToLS('filament-prices', filamentPrices, (30 * 60 * 1000));
@@ -216,7 +224,6 @@ $(function () {
         console.log("Update");
         updatePrice();
     }
-    console.log(filamentPrices);
     update();
     $("#loot").attr("placeholder", "暂不支持！");
 });

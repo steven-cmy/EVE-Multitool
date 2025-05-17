@@ -4,6 +4,7 @@
     <form>
         <div class="row">
             <div class="col-5">
+
                 <fieldset class="rounded border p-2">
                     <legend class="float-none w-auto p-2">收入</legend>
                     <div class="input-group mb-4">
@@ -14,6 +15,29 @@
                     </div>
                     <label for="loot" class="form-label">掉落</label>
                     <textarea class="form-control" id="loot" rows="3" placeholder="粘贴至此..."></textarea>
+                    <div class="row mx-0 mt-2">
+                        <div class="col-5 p-0">
+                            估价地点：
+                            <select name="sell-location" id="sell-location">
+                                <option value="10000002">The Forge</option>
+                            </select>
+                        </div>
+                        <div class="col-7 p-0 d-flex justify-content-end">
+                            价格设置：
+                            <select name="sell-order" id="sell-order">
+                                <option value="buy">Buy</option>
+                                <option value="sell">Sell</option>
+                            </select>
+                            <select name="sell-strat" id="sell-strat">
+                                <option value="max">Max</option>
+                                <option value="median">Median</option>
+                                <option value="min">Min</option>
+                                <option value="percentile">Percentile</option>
+                                <option value="stddev">Stddev</option>
+                                <option value="weightedAverage">WeightedAverage</option>
+                            </select>
+                        </div>
+                    </div>
                 </fieldset>
                 <fieldset class="rounded border p-2">
                     <legend class="float-none w-auto p-2">支出</legend>
@@ -36,7 +60,8 @@
                                 <option value="Gamma">Gamma</option>
                             </select></div>
                         <div class="col-2"><span class="d-flex justify-content-end ms-1">x<input id="filament-count"
-                                    class="w-100 ms-1" type="number" min=0 step=1 value=0></span></div>
+                                    class="w-100 ms-1 border-danger" type="number" min=0 step=1 value=0
+                                    data-bs-toggle="tooltip" data-bs-title="纤维数可能存在误差！"></span></div>
                         <div class="col-6"></div>
                         <div class="col-6 mb-4">
                             <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
@@ -49,6 +74,29 @@
                                 </div>
                                 <input type="number" class="form-control text-end ISK" id="other-cost"
                                     placeholder="ISK支出">
+                            </div>
+                        </div>
+                        <div class="row mx-0 mt-2">
+                            <div class="col-5 p-0">
+                                估价地点：
+                                <select name="buy-location" id="buy-location">
+                                    <option value="10000002">The Forge</option>
+                                </select>
+                            </div>
+                            <div class="col-7 p-0 d-flex justify-content-end">
+                                价格设置：
+                                <select name="buy-order" id="buy-order">
+                                    <option value="buy">Buy</option>
+                                    <option value="sell">Sell</option>
+                                </select>
+                                <select name="buy-strat" id="buy-strat">
+                                    <option value="max">Max</option>
+                                    <option value="median">Median</option>
+                                    <option value="min">Min</option>
+                                    <option value="percentile">Percentile</option>
+                                    <option value="stddev">Stddev</option>
+                                    <option value="weightedAverage">WeightedAverage</option>
+                                </select>
                             </div>
                         </div>
                 </fieldset>
