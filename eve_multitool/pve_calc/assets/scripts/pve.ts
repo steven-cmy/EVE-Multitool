@@ -221,7 +221,7 @@ function updateTable() {
 
     const tStart = time2min(($("#start-time").val() ?? "")?.toString());
     const tEnd = time2min(($("#end-time").val() ?? "")?.toString());
-    if (tStart && tEnd) { $("#total-time").text(min2time((tEnd >= tStart ? tEnd : tEnd + time2min('24:00')) - tStart)); }
+    if ($("#start-time").val() && $("#end-time").val()) { $("#total-time").text(min2time((tEnd >= tStart ? tEnd : tEnd + time2min('24:00')) - tStart)); }
 
     var total_count = 0, total_runs = 0;
     $("#players>tbody>tr").find(".counts").each(function () { total_count += +($(this).val() ?? 0); });
@@ -237,7 +237,6 @@ function saveToLS(key: string, data: any, expiry: number) {
 
 $(function () {
     if (filamentPrices.length === 0) {
-        console.log("Update");
         updatePrice();
     }
     update();
