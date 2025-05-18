@@ -24,21 +24,37 @@ const min2time = (m: number) => `${Number.isInteger(m) ? ' ' : '~'}${String(Math
 function calculate() {
     $("#corp-tax-percetage").text("(" + corp_tax_rate.toLocaleString('en', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ")");
     $("#sales-tax-percetage").text("(" + sales_tax_rate.toLocaleString('en', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ")");
+
     const total_mins = time2min($("#total-time").text() || "00:00");
     const total_count = +($("#total-counts").text());
     const total_runs = +($("#total-runs").text());
+    const filament_count = +($("#filament-count").val() ?? 0);
+    const expect_filament = total_count * total_runs;
+    if (filament_count > 0) {
+        const filament_name = `${$("#abyssal-level").val()} ${$("#abyssal-weather").val()} Filament`;
+        const entry = filamentPrices.find(item => item.name === filament_name)?.price;
+        const order = $("#buy-order").val()?.toString();
+        const strat = $("#buy-strat").val()?.toString();
+        if (entry && order && strat) {
+            $("#filament-cost").attr("data-true-value", +(entry[order][strat] ?? 0) * filament_count)
+        }
+        if (filament_count !== expect_filament) {
+            $("#filament-count").attr("data-bs-toggle", "tooltip").addClass("border-danger");
+        } else {
+            $("#filament-count").removeAttr("data-bs-toggle").removeClass("border-danger");
+            $(".tooltop").remove();
+        }
+    } else {
+        $("#filament-cost").attr("data-true-value", "0");
+        $("#filament-count").removeAttr("data-bs-toggle").removeClass("border-danger");
+        $(".tooltop").remove();
+    }
+
     const total_value = getTotalValue();
     const total_cost = getTotalCost();
     const sales_tax = total_value * sales_tax_rate;
     const corp_tax = (total_value - sales_tax) * corp_tax_rate;
     const net_value = total_value - total_cost - sales_tax - corp_tax;
-    const filament_count = +($("#filament-count").val() ?? 0);
-    const expect_filament = total_count * total_runs;
-    if (filament_count > 0 && filament_count !== expect_filament) {
-        $("#filament-count").attr("data-bs-toggle", "tooltip").addClass("border-danger");
-    } else {
-        $("#filament-count").removeAttr("data-bs-toggle").removeClass("border-danger");
-    }
 
     var adjusted_weights: number[] = [], total_iphs = 0;
     $("#players>tbody>tr").each(function (i) { adjusted_weights[i] = (+($(this).find(".runs").val() ?? 0) / total_runs) * +($(this).find(".weight").val() ?? 0); });
@@ -110,7 +126,7 @@ function fillISk(e: Element, value?: number) {
 }
 
 function getTotalCost(): number {
-    return +($("#other-cost").val() ?? 0) + 0 || 0;
+    return +($("#other-cost").val() ?? 0) + (+($("#filament-cost").attr("data-true-value") ?? 0)) || 0;
 }
 
 function getTotalValue(): number {
