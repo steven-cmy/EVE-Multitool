@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    xiesha
+</div>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ static_url_for('static', filename='build/harvesting_css.bundle.css') }}" />
+{% endblock %}
+
+{% block js %}
+<script src="{{ static_url_for('static', filename='build/harvesting_ts.bundle.js') }}"></script>
+{% endblock %}
