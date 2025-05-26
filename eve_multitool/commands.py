@@ -74,10 +74,11 @@ def lint(fix_imports, check):
 
     isort_args = []
     black_args = []
+    flake8_args = ["--extend-ignore", "E203,W503"]
     if check:
         isort_args.append("--check")
         black_args.append("--check")
     if fix_imports:
         execute_tool("Fixing import order", "isort", *isort_args)
     execute_tool("Formatting style", "black", *black_args)
-    execute_tool("Checking code style", "flake8")
+    execute_tool("Checking code style", "flake8", *flake8_args)

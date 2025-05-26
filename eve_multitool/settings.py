@@ -23,3 +23,11 @@ CACHE_TYPE = (
     "flask_caching.backends.SimpleCache"  # Can be "MemcachedCache", "RedisCache", etc.
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+# EVE Online services
+SSO_ENDPOINT = env.str("EVE_SSO_ENDPOINT")
+SSO_STATE_UID_LENGTH = 16
+ESI_ENDPOINT = f"https://{env.str("EVE_ESI_DOMAIN")}/{env.str("EVE_ESI_VERSION")}/"
+ESI_DATASOURCE = env.str("EVE_ESI_SERVER")
+ESI_CLIENT_ID = env.str("EVE_ESI_CLIENT_ID")
+ESI_SECRET = env.str("EVE_ESI_CLIENT_SECRET")

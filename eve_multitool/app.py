@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 """The app module, containing the app factory function."""
 
+import importlib
 import logging
 import sys
+from pkgutil import iter_modules
 
 from flask import Flask, render_template
 
-from eve_multitool import commands, laohuangli, public, pve_calc, user
+import eve_multitool
+from eve_multitool import commands, user
 from eve_multitool.extensions import (
     bcrypt,
     cache,
@@ -50,10 +53,13 @@ def register_extensions(app):
 
 def register_blueprints(app):
     """Register Flask blueprints."""
-    app.register_blueprint(public.views.blueprint)
-    app.register_blueprint(pve_calc.views.blueprint)
-    app.register_blueprint(laohuangli.views.blueprint)
-    app.register_blueprint(user.views.blueprint)
+    for module_info in list(iter_modules(eve_multitool.__path__)):
+        try:
+            views = importlib.import_module(f"eve_multitool.{module_info.name}.views")
+            app.register_blueprint(views.blueprint)
+            print(f"REGISTERED: {module_info.name}")
+        except ModuleNotFoundError:
+            pass
     return None
 
 
