@@ -1,6 +1,20 @@
-const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
+const eslintPluginPrettierRecommended = require("eslint-plugin-prettier/recommended");
+const tsParser = require("@typescript-eslint/parser");
 
 module.exports = [
-  // Any other config imports go at the top
-  eslintPluginPrettierRecommended,
+  {
+    files: ["**/*.ts"],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: "./tsconfig.json",
+        sourceType: "module",
+      },
+    },
+    ...eslintPluginPrettierRecommended,
+  },
+  {
+    files: ["**/*.js"],
+    ...eslintPluginPrettierRecommended,
+  },
 ];

@@ -8,6 +8,7 @@
 require("@fortawesome/fontawesome-free");
 require("jquery");
 require("bootstrap");
+require("vue");
 
 require.context(
   "../img", // context folder

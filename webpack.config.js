@@ -24,9 +24,8 @@ module.exports = {
   // configuration
   context: __dirname,
   entry: {
-    // Dynamic discovery of JS and TS files in scripts directories
     ...glob
-      .sync("./eve_multitool/*/assets/**/*.{ts,js,css}")
+      .sync("./eve_multitool/*/assets/**/*.{ts,js,css,vue}")
       .reduce((acc, filePath) => {
         const filename = path.basename(filePath);
         const ext = path.extname(filePath).slice(1);
@@ -63,7 +62,10 @@ module.exports = {
     publicPath: "/static/build/",
   },
   resolve: {
-    extensions: [".js", ".jsx", ".ts", ".tsx", ".css"],
+    extensions: [".js", ".jsx", ".ts", ".tsx", ".css", ".vue"],
+    alias: {
+      vue: "@vue/runtime-dom",
+    },
   },
   devtool: debug ? "eval-source-map" : false,
   plugins: [
@@ -72,6 +74,10 @@ module.exports = {
   ].concat(debug ? [] : ProductionPlugins),
   module: {
     rules: [
+      {
+        test: /\.vue$/,
+        loader: "vue-loader",
+      },
       {
         test: /\.less$/,
         use: [

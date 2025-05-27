@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div id="app">
+    <h1>{{ message }}</h1>
+</div>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ static_url_for('static', filename='build/vue_css.bundle.css') }}" />
+{% endblock %}
+
+{% block js %}
+<script src="{{ static_url_for('static', filename='build/vue_ts.bundle.js') }}"></script>
+{% endblock %}

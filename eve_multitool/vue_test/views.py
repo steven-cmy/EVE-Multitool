@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""PvE Calc views."""
+"""Laohuangli views."""
 
 from flask import Blueprint, render_template
 
 blueprint = Blueprint(
-    "pve_calc",
+    "vue",
     __name__,
-    url_prefix="/pve-calc",
+    url_prefix="/vue",
     static_folder="../static",
     template_folder="./templates",
 )
@@ -14,5 +14,5 @@ blueprint = Blueprint(
 
 @blueprint.route("/")
 def main():
-    """pve_calc."""
-    return render_template("pve_calc.html")
+    """VUE."""
+    return render_template("vue.html")

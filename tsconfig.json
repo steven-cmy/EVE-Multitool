@@ -2,13 +2,14 @@
     "extends": "@tsconfig/node-lts/tsconfig.json",
     "compilerOptions": {
         "lib": [
-            "dom"   
+            "dom"
         ],
         "outDir": "eve_multitool/static/build", // Output directory for compiled JavaScript files
         "esModuleInterop": true,
         "strict": true
     },
     "include": [
-        "eve_multitool/*/assets/**/*"
+        "eve_multitool/*/assets/**/*",
+        "assets/js/*"
     ]
 }
