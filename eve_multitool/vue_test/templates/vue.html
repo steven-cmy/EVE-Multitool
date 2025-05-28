@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% raw %}
+<div id="app">
+    <div class="container">
+        <button @click="increment">Count is: {{ count }}</button>
+    </div>
+</div>
+{% endraw %}
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ static_url_for('static', filename='build/vue_css.bundle.css') }}" />
+{% endblock %}
+
+{% block js %}
+<script src="{{ static_url_for('static', filename='build/vue_ts.bundle.js') }}"></script>
+{% endblock %}
