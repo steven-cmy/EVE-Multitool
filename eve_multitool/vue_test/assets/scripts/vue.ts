@@ -1,10 +1,17 @@
-import { createApp } from "vue";
-console.log("Importing Vue...");
+import { createApp, ref } from "vue";
+
 createApp({
-  data() {
+  setup() {
+    const count = ref(0);
+
+    function increment() {
+      count.value++;
+      console.log(count.value);
+    }
+
     return {
-      message: "Hello, Vue!",
+      count,
+      increment,
     };
   },
 }).mount("#app");
-console.log("Vue app initialized");

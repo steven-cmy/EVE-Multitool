@@ -1,9 +1,13 @@
 {% extends "layout.html" %}
 
 {% block content %}
+{% raw %}
 <div id="app">
-    <h1>{{ message }}</h1>
+    <div class="container">
+        <button @click="increment">Count is: {{ count }}</button>
+    </div>
 </div>
+{% endraw %}
 {% endblock %}
 
 {% block css %}

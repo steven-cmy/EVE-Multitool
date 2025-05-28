@@ -64,7 +64,7 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx", ".css", ".vue"],
     alias: {
-      vue: "@vue/runtime-dom",
+      vue: "vue/dist/vue.esm-bundler.js",
     },
   },
   devtool: debug ? "eval-source-map" : false,
