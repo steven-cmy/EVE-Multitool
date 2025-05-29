@@ -194,3 +194,4 @@ cython_debug/
 
 # Development database
 *.db
+migrations/

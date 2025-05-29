@@ -25,7 +25,7 @@ module.exports = {
   context: __dirname,
   entry: {
     ...glob
-      .sync("./eve_multitool/*/assets/**/*.{ts,js,css,vue}")
+      .sync("./eve_multitool/*/assets/**/*.{ts,js,css}")
       .reduce((acc, filePath) => {
         const filename = path.basename(filePath);
         const ext = path.extname(filePath).slice(1);
@@ -62,7 +62,7 @@ module.exports = {
     publicPath: "/static/build/",
   },
   resolve: {
-    extensions: [".js", ".jsx", ".ts", ".tsx", ".css", ".vue"],
+    extensions: [".js", ".jsx", ".ts", ".tsx", ".css"],
     alias: {
       vue: "vue/dist/vue.esm-bundler.js",
     },
@@ -74,10 +74,6 @@ module.exports = {
   ].concat(debug ? [] : ProductionPlugins),
   module: {
     rules: [
-      {
-        test: /\.vue$/,
-        loader: "vue-loader",
-      },
       {
         test: /\.less$/,
         use: [

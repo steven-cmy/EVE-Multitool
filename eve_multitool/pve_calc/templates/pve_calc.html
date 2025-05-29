@@ -1,4 +1,7 @@
-{% extends "layout.html" %} {% block content %}
+{% extends "layout.html" %}
+
+{% block content %}
+{% raw %}
 <div class="container" id="app">
     <h1>PvE分成计算器</h1>
     <form>
@@ -11,7 +14,8 @@
                         <div class="input-group-prepend">
                             <div class="input-group-text">ISK</div>
                         </div>
-                        <input type="number" class="form-control text-end ISK" id="income-value" placeholder="ISK收入">
+                        <input type="number" class="form-control text-end ISK" id="income-value" v-model="isk_income"
+                            placeholder="ISK收入">
                     </div>
                     <label for="loot" class="form-label">掉落</label>
                     <textarea class="form-control" id="loot" rows="3" placeholder="粘贴至此..." disabled></textarea>
@@ -109,14 +113,14 @@
                             <label for="start-time">
                                 开始时间：
                             </label>
-                            <input id="start-time" type="time" name="start-time" />
+                            <input id="start-time" type="time" name="start-time" v-model="start_time" />
                             <label for="end-time">
                                 结束时间：
                             </label>
-                            <input id="end-time" type="time" name="end-time" />
+                            <input id="end-time" type="time" name="end-time" v-model="end_time" />
                         </div>
-                        <div><i class="ms-4 fa-solid fa-minus clickable" id="remove-entry"></i><i
-                                class="ms-4 fa-solid fa-plus clickable" id="add-entry"></i></div>
+                        <div><i class="ms-4 fa-solid fa-minus clickable" id="remove-entry" @click="removeEntry"></i><i
+                                class="ms-4 fa-solid fa-plus clickable" id="add-entry" @click="addEntry"></i></div>
                     </div>
                     <thead>
                         <tr>
@@ -129,40 +133,52 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr id="1">
-                            <th scope="row"><input class="w-100 playerName" type="text" placeholder="ID/职务">
+                        <tr v-for="(p, i) in participants" :key="i" v-cloak>
+                            <th scope="row">
+                                <input class="w-100 playerName" type="text" placeholder="ID/职务" v-model="p.name">
                             </th>
-                            <td><input class="w-100 counts" type="number" min="1" value=1></td>
-                            <td><input class="w-100 weight" type="number" min="0.1" step="0.1" value=1></td>
-                            <td><input class="w-100 runs" type="number" min="1" value=1></td>
+                            <td><input class="w-100 counts" type="number" min="1" v-model.number="p.count"></td>
+                            <td><input class="w-100 weight" type="number" min="0.1" step="0.1" v-model.number="p.weight"></td>
+                            <td><input class="w-100 runs" type="number" min="1" v-model.number="p.run"></td>
                             <td>
-                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                        class="copyable ISK share" data-true-value="0">...</span></div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="me-1">ISK</span>
+                                    <span class="copyable ISK share" :data-true-value="updateParticipants[i].share"
+                                        @click="copyTrueValue">
+                                        {{ updateParticipants[i].share ? updateParticipants[i].share.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-' }}
+                                    </span>
+                                </div>
                             </td>
                             <td>
                                 <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                        class="copyable ISK iph" data-true-value="0">...</span></div>
+                                        class="copyable ISK iph" :data-true-value="updateParticipants[i].iph"
+                                        @click="copyTrueValue">{{
+                                        updateParticipants[i].iph ?
+                                        updateParticipants[i].iph.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
+                                        2,}) : '-' }}</span></div>
                             </td>
                         </tr>
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th scope="row">总计<span class="fw-normal">（耗时 <span id="total-time">--:--</span>）</span>
+                            <th scope="row">总计<span class="fw-normal">（耗时 <span id="total-time">{{total_time}}</span>）</span>
                             </th>
                             <td>
-                                <div class="w-100 text-center"><span id="total-counts">1</span>人</div>
+                                <div class="w-100 text-center"><span id="total-counts">{{total_counts}}</span>人</div>
                             </td>
                             <td>
-                                <div class="w-100 text-center"><span id="total-runs">1</span>点/轮</div>
+                                <div class="w-100 text-center"><span id="total-runs">{{total_runs}}</span>点/轮</div>
                             </td>
                             <th scope="row">平均</th>
                             <td>
                                 <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                        class="copyable ISK" id="avg-share" data-true-value="0">...</span></div>
+                                        class="copyable ISK" id="avg-share" data-true-value="0"
+                                        @click="copyTrueValue">...</span></div>
                             </td>
                             <td>
                                 <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                        class="copyable ISK" id="avg-iph" data-true-value="0">...</span></div>
+                                        class="copyable ISK" id="avg-iph" data-true-value="0"
+                                        @click="copyTrueValue">...</span></div>
                             </td>
                         </tr>
                     </tfoot>
@@ -173,43 +189,64 @@
                         <div class="d-flex justify-content-between">
                             <span>毛利润</span>
                             <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="gross-value" data-true-value="0">...</span></div>
+                                    class="copyable ISK" id="gross-value" data-true-value="0" @click="copyTrueValue"
+                                    v-cloak>{{ gross_income ?
+                                    gross_income.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
+                                    2,}) : '-' }}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="d-flex justify-content-between">
                             <span>额外开销</span>
                             <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="total-cost" data-true-value="0">...</span></div>
+                                    class="copyable ISK" id="total-cost" data-true-value="0"
+                                    @click="copyTrueValue">...</span></div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="d-flex justify-content-between">
-                            <span>销售税<i class="text-body-tertiary" id="sales-tax-percetage">(0.00%)</i></span>
+                            <span>销售税<i class="text-body-tertiary" id="sales-tax-percetage"
+                                    v-cloak>({{sales_tax_rate.toLocaleString("en", { style: "percent",
+                                    minimumFractionDigits: 2, maximumFractionDigits: 2 })}})</i></span>
                             <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="sales-tax" data-true-value="0">...</span></div>
+                                    class="copyable ISK" id="sales-tax" data-true-value="0" @click="copyTrueValue"
+                                    v-cloak>{{ sales_tax ?
+                                    sales_tax.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
+                                    2,}) : '-' }}</span></div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="d-flex justify-content-between">
-                            <span>公司税<i class="text-body-tertiary" id="corp-tax-percentage">(0.00%)</i></span>
+                            <span>公司税<i class="text-body-tertiary" id="corp-tax-percentage"
+                                    v-cloak>({{corp_tax_rate.toLocaleString("en", { style: "percent",
+                                    minimumFractionDigits: 2, maximumFractionDigits: 2 })}})</i></span>
                             <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="corp-tax" data-true-value="0">...</span></div>
+                                    class="copyable ISK" id="corp-tax" data-true-value="0" @click="copyTrueValue"
+                                    v-cloak>{{ corp_tax ?
+                                    corp_tax.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
+                                    2,}) : '-' }}</span></div>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="d-flex justify-content-between">
                             <span>净利润</span>
                             <div class="d-flex justify-content-between fw-bold"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="net-value" data-true-value="0">...</span></div>
+                                    class="copyable ISK" id="net-value" :data-true-value="net_income"
+                                    @click="copyTrueValue" v-cloak>{{ net_income ?
+                                    net_income.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
+                                    2,}) : '-' }}</span></div>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="d-flex justify-content-between">
                             <span>平均每点/轮净利润</span>
                             <div class="d-flex justify-content-between"><span class="text-nowrap">（耗时 <span
-                                        id="time-per-run">--:--</span>）</span><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="avg-per-run" data-true-value="0">...</span></div>
+                                        id="time-per-run">{{avg_time}}</span>）</span><span class="me-1">ISK</span><span
+                                    class="copyable ISK" id="avg-per-run" :data-true-value="avg_per_run"
+                                    @click="copyTrueValue" v-cloak>{{ avg_per_run ?
+                                    avg_per_run.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
+                                    2,}) : '-' }}</span></div>
                         </div>
                     </div>
                     <div class="col-12">
@@ -224,6 +261,7 @@
         </div>
     </form>
 </div>
+{% endraw %}
 {% endblock %}
 
 {% block css %}
