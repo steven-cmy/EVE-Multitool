@@ -3,263 +3,293 @@
 {% block content %}
 {% raw %}
 <div class="container" id="app">
-    <h1>PvE分成计算器</h1>
-    <form>
-        <div class="row">
-            <div class="col-5">
+    <n-config-provider :locale="naiveLocale" :date-locale="naiveDateLocale">
+        <h1>PvE分成计算器</h1>
+        <form>
+            <div class="row">
+                <div class="col-5">
 
-                <fieldset class="rounded border p-2">
-                    <legend class="float-none w-auto p-2">收入</legend>
-                    <div class="input-group mb-4">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">ISK</div>
-                        </div>
-                        <input type="number" class="form-control text-end ISK" id="income-value" v-model="isk_income"
-                            placeholder="ISK收入">
-                    </div>
-                    <label for="loot" class="form-label">掉落</label>
-                    <textarea class="form-control" id="loot" rows="3" placeholder="粘贴至此..." disabled></textarea>
-                    <div class="row mx-0 mt-2">
-                        <div class="col-5 p-0">
-                            估价地点：
-                            <select name="sell-location" id="sell-location">
-                                <option value="10000002">The Forge</option>
-                            </select>
-                        </div>
-                        <div class="col-7 p-0 d-flex justify-content-end">
-                            价格设置：
-                            <select name="sell-order" id="sell-order">
-                                <option value="buy" selected="selected">Buy</option>
-                                <option value="sell">Sell</option>
-                            </select>
-                            <select name="sell-strat" id="sell-strat">
-                                <option value="max">Max</option>
-                                <option value="median">Median</option>
-                                <option value="min">Min</option>
-                                <option value="percentile" selected="selected">Percentile</option>
-                                <option value="stddev">Stddev</option>
-                                <option value="weightedAverage">WeightedAverage</option>
-                            </select>
-                        </div>
-                    </div>
-                </fieldset>
-                <fieldset class="rounded border p-2">
-                    <legend class="float-none w-auto p-2">支出</legend>
-                    <div class="row">
-                        <div class="col-2 mb-4">纤维：</div>
-                        <div class="col-4"><select name="abyssal-level" id="abyssal-level">
-                                <option value="Tranquil">T0 - Tranquil</option>
-                                <option value="Calm">T1 - Calm</option>
-                                <option value="Agitated">T2 - Agitated</option>
-                                <option value="Fierce">T3 - Fierce</option>
-                                <option value="Raging">T4 - Raging</option>
-                                <option value="Chaotic">T5 - Chaotic</option>
-                                <option value="Cataclysmic">T6 - Cataclysmic</option>
-                            </select></div>
-                        <div class="col-4"><select name="abyssal-weather" id="abyssal-weather">
-                                <option value="Electrical">Electrical</option>
-                                <option value="Dark">Dark</option>
-                                <option value="Exotic">Exotic</option>
-                                <option value="Firestorm">Firestorm</option>
-                                <option value="Gamma">Gamma</option>
-                            </select></div>
-                        <div class="col-2"><span class="d-flex justify-content-end ms-1">x<input id="filament-count"
-                                    class="w-100 ms-1 border-danger" type="number" min=0 step=1 value=0
-                                    data-bs-toggle="tooltip" data-bs-title="纤维数可能存在误差！"></span></div>
-                        <div class="col-6"></div>
-                        <div class="col-6 mb-4">
-                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="filament-cost" data-true-value="0">...</span></div>
-                        </div>
-                        <div class="col-12">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">ISK</div>
-                                </div>
-                                <input type="number" class="form-control text-end ISK" id="other-cost"
-                                    placeholder="ISK支出">
-                            </div>
+                    <fieldset class="rounded border p-2">
+                        <legend class="float-none w-auto p-2">收入</legend>
+                        <n-input-number class="ISK mb-4" v-model:value="isk_income" :show-button="false" :min="0"
+                            :step="0.01" :precision="2" placeholder="ISK收入" update-value-on-input>
+                            <template #prefix>
+                                ISK
+                            </template>
+                        </n-input-number>
+                        <label for="loot" class="form-label">掉落：</label>
+                        <div class="mb-4">
+                            <n-input type="textarea" v-model:value="loot_table" placeholder="粘贴至此..." disabled />
                         </div>
                         <div class="row mx-0 mt-2">
-                            <div class="col-5 p-0">
+                            <n-flex :wrap=false class="col-5 p-0">
                                 估价地点：
-                                <select name="buy-location" id="buy-location">
-                                    <option value="10000002">The Forge</option>
-                                </select>
-                            </div>
+                                <div>
+                                    <n-select v-model:value="sell_location" :options="locations" size="small" />
+                                </div>
+                            </n-flex>
                             <div class="col-7 p-0 d-flex justify-content-end">
                                 价格设置：
-                                <select name="buy-order" id="buy-order">
-                                    <option value="buy">Buy</option>
-                                    <option value="sell" selected="selected">Sell</option>
-                                </select>
-                                <select name="buy-strat" id="buy-strat">
-                                    <option value="max">Max</option>
-                                    <option value="median">Median</option>
-                                    <option value="min">Min</option>
-                                    <option value="percentile" selected="selected">Percentile</option>
-                                    <option value="stddev">Stddev</option>
-                                    <option value="weightedAverage">WeightedAverage</option>
-                                </select>
-                            </div>
-                        </div>
-                </fieldset>
-            </div>
-
-            <div class="col-7">
-                <table class="table align-middle table-hover" id="players">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <label for="start-time">
-                                开始时间：
-                            </label>
-                            <input id="start-time" type="time" name="start-time" v-model="start_time" />
-                            <label for="end-time">
-                                结束时间：
-                            </label>
-                            <input id="end-time" type="time" name="end-time" v-model="end_time" />
-                        </div>
-                        <div><i class="ms-4 fa-solid fa-minus clickable" id="remove-entry" @click="removeEntry"></i><i
-                                class="ms-4 fa-solid fa-plus clickable" id="add-entry" @click="addEntry"></i></div>
-                    </div>
-                    <thead>
-                        <tr>
-                            <th class="col-3" scope="col">参与者</th>
-                            <th class="col-1" scope="col">人数</th>
-                            <th class="col-1" scope="col">系数</th>
-                            <th class="col-1" scope="col">点/轮数</th>
-                            <th class="col-3" scope="col">分成</th>
-                            <th class="col-3" scope="col">ISK每小时</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(p, i) in participants" :key="i" v-cloak>
-                            <th scope="row">
-                                <input class="w-100 playerName" type="text" placeholder="ID/职务" v-model="p.name">
-                            </th>
-                            <td><input class="w-100 counts" type="number" min="1" v-model.number="p.count"></td>
-                            <td><input class="w-100 weight" type="number" min="0.1" step="0.1" v-model.number="p.weight"></td>
-                            <td><input class="w-100 runs" type="number" min="1" v-model.number="p.run"></td>
-                            <td>
-                                <div class="d-flex justify-content-between">
-                                    <span class="me-1">ISK</span>
-                                    <span class="copyable ISK share" :data-true-value="updateParticipants[i].share"
-                                        @click="copyTrueValue">
-                                        {{ updateParticipants[i].share ? updateParticipants[i].share.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-' }}
-                                    </span>
+                                <div>
+                                    <n-select v-model:value="sell_order" :options="orders" size="small" />
                                 </div>
-                            </td>
-                            <td>
-                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                        class="copyable ISK iph" :data-true-value="updateParticipants[i].iph"
-                                        @click="copyTrueValue">{{
-                                        updateParticipants[i].iph ?
-                                        updateParticipants[i].iph.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
-                                        2,}) : '-' }}</span></div>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th scope="row">总计<span class="fw-normal">（耗时 <span id="total-time">{{total_time}}</span>）</span>
-                            </th>
-                            <td>
-                                <div class="w-100 text-center"><span id="total-counts">{{total_counts}}</span>人</div>
-                            </td>
-                            <td>
-                                <div class="w-100 text-center"><span id="total-runs">{{total_runs}}</span>点/轮</div>
-                            </td>
-                            <th scope="row">平均</th>
-                            <td>
-                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                        class="copyable ISK" id="avg-share" data-true-value="0"
-                                        @click="copyTrueValue">...</span></div>
-                            </td>
-                            <td>
-                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                        class="copyable ISK" id="avg-iph" data-true-value="0"
-                                        @click="copyTrueValue">...</span></div>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <div class="separator mt-5">结算</div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="d-flex justify-content-between">
-                            <span>毛利润</span>
-                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="gross-value" data-true-value="0" @click="copyTrueValue"
-                                    v-cloak>{{ gross_income ?
-                                    gross_income.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
-                                    2,}) : '-' }}</span>
+                                <div>
+                                    <n-select v-model:value="sell_strat" :options="strats" size="small" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="d-flex justify-content-between">
-                            <span>额外开销</span>
-                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="total-cost" data-true-value="0"
-                                    @click="copyTrueValue">...</span></div>
+                    </fieldset>
+                    <fieldset class="rounded border p-2">
+                        <legend class="float-none w-auto p-2">支出</legend>
+                        <div class="row">
+
+                            <div class="col-2 mb-4">纤维：</div>
+                            <div class="col-4">
+                                <n-select v-model:value="abyssal_level" :options="abyssal_levels" />
+                            </div>
+                            <div class="col-3">
+                                <n-select v-model:value="abyssal_weather" :options="abyssal_weathers" />
+                            </div>
+                            <div class="col-3">
+                                <n-input-group>
+                                    <n-input-group-label>✕</n-input-group-label>
+                                    <n-popover trigger="hover" :disabled="filament_count_warning !== 'warning'" v-cloak>
+                                        <template #trigger>
+                                            <n-input-number v-model:value="abyssal_filament_count" :show-button=false
+                                                :min=0 :step=1 :precision="0" placeholder="纤维数"
+                                                :status="filament_count_warning" />
+                                        </template>
+                                        纤维数可能存在误差！
+                                    </n-popover>
+                                </n-input-group>
+                            </div>
+                            <div class="col-6"></div>
+                            <div class="col-6 mb-4">
+                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span>
+                                    <span class="copyable ISK" id="filament-cost" :data-true-value="abyssal_cost"
+                                        @click="copyTrueValue" v-cloak>{{
+                                        abyssal_cost ?
+                                        abyssal_cost.toLocaleString("en", {minimumFractionDigits: 2,
+                                        maximumFractionDigits:
+                                        2,}) : '-' }}</span>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-4">
+                                <n-input-number class="ISK" v-model:value="isk_cost" :show-button="false" :min="0"
+                                    :step="0.01" :precision="2" placeholder="ISK支出" update-value-on-input>
+                                    <template #prefix>
+                                        ISK
+                                    </template>
+                                </n-input-number>
+                            </div>
+                            <div class="col-12 mb-4">
+                                <label for="consumed" class="form-label">使用物品：</label>
+                                <n-input type="textarea" v-model:value="consumed_items" placeholder="粘贴至此..."
+                                    disabled />
+                            </div>
+                            <div class="row mx-0 mt-2">
+                                <n-flex :wrap=false class="col-5 p-0">
+                                    估价地点：
+                                    <div>
+                                        <n-select v-model:value="buy_location" :options="locations" size="small" />
+                                    </div>
+                                </n-flex>
+                                <div class="col-7 p-0 d-flex justify-content-end">
+                                    价格设置：
+                                    <div>
+                                        <n-select v-model:value="buy_order" :options="orders" size="small" />
+                                    </div>
+                                    <div>
+                                        <n-select v-model:value="buy_strat" :options="strats" size="small" />
+                                    </div>
+                                </div>
+                            </div>
+                    </fieldset>
+                </div>
+
+                <div class="col-7">
+                    <table class="table align-middle table-hover" id="players">
+                        <n-flex justify="end" :wrap="false">
+                            <n-flex :wrap="false" align="center">
+                                <n-input-group>
+                                    <n-input-group-label>开始时间：</n-input-group-label>
+                                    <n-time-picker v-model:value="start_time" format="H:mm"
+                                        :actions="['now', 'clear']" />
+                                </n-input-group>
+                                <n-input-group>
+                                    <n-input-group-label>结束时间：</n-input-group-label>
+                                    <n-time-picker v-model:value="end_time" format="H:mm" :actions="['now', 'clear']" />
+                                </n-input-group>
+                            </n-flex>
+                            <div>
+                                <i class="ms-4 fa-solid fa-minus clickable" id="remove-entry" @click="removeEntry"></i>
+                                <i class="ms-4 fa-solid fa-plus clickable" id="add-entry" @click="addEntry"></i>
+                            </div>
+                        </n-flex>
+                        <thead>
+                            <tr>
+                                <th class="col-3" scope="col">参与者</th>
+                                <th class="col-1" scope="col">人数</th>
+                                <th class="col-1" scope="col">点数</th>
+                                <th class="col-1" scope="col">系数</th>
+                                <th class="col-3" scope="col">每人分成</th>
+                                <th class="col-3" scope="col">每人ISK每小时</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(p, i) in participants" :key="i" v-cloak>
+                                <th scope="row"><n-input placeholder="ID/职务" v-model="p.name" /></th>
+                                <td>
+                                    <n-input-number v-model:value="p.count" :show-button="false" :min="1" :step="1"
+                                        :precision="0" placeholder="人数" update-value-on-input>
+                                </td>
+                                <td><n-input-number v-model:value="p.run" :show-button="false" :min="1" :step="1"
+                                        :precision="0" placeholder="点数" update-value-on-input></td>
+                                <td><n-input-number v-model:value="p.weight" :show-button="false" :min="0.1" :step="0.1"
+                                        :precision="1" placeholder="系数" update-value-on-input></td>
+                                <td>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="me-1">ISK</span>
+                                        <span class="copyable ISK share" :data-true-value="updateParticipants[i].share"
+                                            @click="copyTrueValue">
+                                            {{ updateParticipants[i].share ?
+                                            updateParticipants[i].share.toLocaleString("en", {minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2}) : '-' }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                            class="copyable ISK iph" :data-true-value="updateParticipants[i].iph"
+                                            @click="copyTrueValue">{{
+                                            updateParticipants[i].iph ?
+                                            updateParticipants[i].iph.toLocaleString("en", {minimumFractionDigits: 2,
+                                            maximumFractionDigits:
+                                            2,}) : '-' }}</span></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th scope="row">总计<span class="fw-normal" v-cloak>（耗时 <span
+                                            id="total-time">{{total_time}}</span>）</span>
+                                </th>
+                                <td>
+                                    <div class="w-100 text-center" v-cloak><span
+                                            id="total-counts">{{total_counts}}</span>人
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="w-100 text-center" v-cloak><span id="total-runs">{{total_runs}}</span>点
+                                    </div>
+                                </td>
+                                <th scope="row">平均</th>
+                                <td>
+                                    <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                            class="copyable ISK" id="avg-share" :data-true-value="avg_share"
+                                            @click="copyTrueValue" v-cloak>{{ avg_share ?
+                                            avg_share.toLocaleString("en", {minimumFractionDigits: 2,
+                                            maximumFractionDigits:
+                                            2,}) : '-' }}</span></div>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                            class="copyable ISK" id="avg-iph" :data-true-value="avg_iph"
+                                            @click="copyTrueValue" v-cloak>{{ avg_iph ?
+                                            avg_iph.toLocaleString("en", {minimumFractionDigits: 2,
+                                            maximumFractionDigits:
+                                            2,}) : '-' }}</span></div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="separator mt-5">结算</div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <span>毛利润</span>
+                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                        class="copyable ISK" id="gross-value" :data-true-value="gross_income"
+                                        @click="copyTrueValue" v-cloak>{{ gross_income ?
+                                        gross_income.toLocaleString("en", {minimumFractionDigits: 2,
+                                        maximumFractionDigits:
+                                        2,}) : '-' }}</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="d-flex justify-content-between">
-                            <span>销售税<i class="text-body-tertiary" id="sales-tax-percetage"
-                                    v-cloak>({{sales_tax_rate.toLocaleString("en", { style: "percent",
-                                    minimumFractionDigits: 2, maximumFractionDigits: 2 })}})</i></span>
-                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="sales-tax" data-true-value="0" @click="copyTrueValue"
-                                    v-cloak>{{ sales_tax ?
-                                    sales_tax.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
-                                    2,}) : '-' }}</span></div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <span>额外开销</span>
+                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                        class="copyable ISK" id="total-cost" :data-true-value="total_cost"
+                                        @click="copyTrueValue" v-cloak>{{ total_cost ?
+                                        total_cost.toLocaleString("en", {minimumFractionDigits: 2,
+                                        maximumFractionDigits:
+                                        2,}) : '-' }}</span></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="d-flex justify-content-between">
-                            <span>公司税<i class="text-body-tertiary" id="corp-tax-percentage"
-                                    v-cloak>({{corp_tax_rate.toLocaleString("en", { style: "percent",
-                                    minimumFractionDigits: 2, maximumFractionDigits: 2 })}})</i></span>
-                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="corp-tax" data-true-value="0" @click="copyTrueValue"
-                                    v-cloak>{{ corp_tax ?
-                                    corp_tax.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
-                                    2,}) : '-' }}</span></div>
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between">
+                                <span>销售税<i class="text-body-tertiary" id="sales-tax-percentage"
+                                        v-cloak>({{sales_tax_rate.toLocaleString("en", { style: "percent",
+                                        minimumFractionDigits: 2, maximumFractionDigits: 2 })}})</i></span>
+                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                        class="copyable ISK" id="sales-tax" :data-true-value="sales_tax"
+                                        @click="copyTrueValue" v-cloak>{{ sales_tax ?
+                                        sales_tax.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
+                                        2,}) : '-' }}</span></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="d-flex justify-content-between">
-                            <span>净利润</span>
-                            <div class="d-flex justify-content-between fw-bold"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="net-value" :data-true-value="net_income"
-                                    @click="copyTrueValue" v-cloak>{{ net_income ?
-                                    net_income.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
-                                    2,}) : '-' }}</span></div>
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between">
+                                <span>公司税<i class="text-body-tertiary" id="corp-tax-percentage"
+                                        v-cloak>({{corp_tax_rate.toLocaleString("en", { style: "percent",
+                                        minimumFractionDigits: 2, maximumFractionDigits: 2 })}})</i></span>
+                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                        class="copyable ISK" id="corp-tax" :data-true-value="corp_tax"
+                                        @click="copyTrueValue" v-cloak>{{ corp_tax ?
+                                        corp_tax.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
+                                        2,}) : '-' }}</span></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="d-flex justify-content-between">
-                            <span>平均每点/轮净利润</span>
-                            <div class="d-flex justify-content-between"><span class="text-nowrap">（耗时 <span
-                                        id="time-per-run">{{avg_time}}</span>）</span><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="avg-per-run" :data-true-value="avg_per_run"
-                                    @click="copyTrueValue" v-cloak>{{ avg_per_run ?
-                                    avg_per_run.toLocaleString("en", {minimumFractionDigits: 2, maximumFractionDigits:
-                                    2,}) : '-' }}</span></div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <span>净利润</span>
+                                <div class="d-flex justify-content-between fw-bold"><span class="me-1">ISK</span><span
+                                        class="copyable ISK" id="net-value" :data-true-value="net_income"
+                                        @click="copyTrueValue" v-cloak>{{ net_income ?
+                                        net_income.toLocaleString("en", {minimumFractionDigits: 2,
+                                        maximumFractionDigits:
+                                        2,}) : '-' }}</span></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="d-flex justify-content-between">
-                            <span>总ISK每小时</span>
-                            <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
-                                    class="copyable ISK" id="total-iph" data-true-value="0">...</span></div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <span>平均每点净利润</span>
+                                <div><span class="text-nowrap" v-cloak>（耗时 <span
+                                            id="time-per-run">{{avg_time}}</span>）</span><span
+                                        class="me-1">ISK</span><span class="copyable ISK" id="avg-per-run"
+                                        :data-true-value="avg_per_run" @click="copyTrueValue" v-cloak>{{ avg_per_run ?
+                                        avg_per_run.toLocaleString("en", {minimumFractionDigits: 2,
+                                        maximumFractionDigits:
+                                        2,}) : '-' }}</span></div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <span>总ISK每小时</span>
+                                <div class="d-flex justify-content-between"><span class="me-1">ISK</span><span
+                                        class="copyable ISK" id="total-iph" :data-true-value="total_iph"
+                                        @click="copyTrueValue" v-cloak>{{ total_iph ?
+                                        total_iph.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                        2,}) : '-' }}</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </n-config-provider>
 </div>
 {% endraw %}
 {% endblock %}
