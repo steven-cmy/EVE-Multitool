@@ -13,37 +13,34 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
     {
-      path: '/sso/callback',
-      name: 'sso-callback',
-      redirect: to => {
-        const tokenStore = useTokenStore()
-        if (to.query.token&&to.query.state) {
-          const state = (to.query.state as string).slice(0, tokenStore.stateLength)
-          if (!tokenStore.checkState(state)) {
-            console.error('Invalid state in SSO callback')
-            return '/'
-          }
-          if (!tokenStore.validateToken(to.query.token as string)) {
-            console.error('Invalid token in SSO callback')
-            return '/'
-          }
-
-          // Store the token
-          tokenStore.token = to.query.token as string
-          localStorage.setItem('sso-token', tokenStore.token)
-
-          // Clear the state
-          sessionStorage.removeItem('sso-state')
+      path: '/sso',
+      name: 'sso',
+      children: [
+        {
+          path: 'login',
+          name: 'sso-login',
+          component: HomeView,
+          beforeEnter: async (to, from) => {
+            const tokenStore = useTokenStore()
+            tokenStore.clearTokens()
+            const url = await tokenStore.generateAuthUrl(to.query.scope as string, (to.query.redirect as string) || from.fullPath)
+            debugger
+            window.location.href = url
+          },
+        },
+        {
+          path: 'callback',
+          name: 'sso-callback',
+          component: HomeView,
+          beforeEnter: async (to) => {
+            const tokenStore = useTokenStore()
+            return await tokenStore.callbackHandler(to.query.code as string, to.query.state as string)
+          },
         }
-
-        return decodeURIComponent((to.query.state as string).slice(tokenStore.stateLength)) ?? '/'
-      }
+      ]
     }
   ],
 })

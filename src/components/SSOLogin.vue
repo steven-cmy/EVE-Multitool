@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { useTokenStore } from '@/stores/sso-token';
 import { computed, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute, RouterLink } from 'vue-router';
 
 const route = useRoute()
-const router = useRouter()
-const tokenStore = useTokenStore()
 
 const isDarkMode = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
 
@@ -20,16 +17,20 @@ const props = withDefaults(defineProps<{
   scope?: string,
   redirect?: string
 }>(), {
-  scope: "publicData",
+  scope: "publicData"
 })
 
-const loginUrl = ref('')
-loginUrl.value = await tokenStore.generateAuthUrl(props.scope, props.redirect || route.fullPath)
-
+const loginUrl = computed(() => ({
+  name: 'sso-login',
+  query: {
+    scope: props.scope,
+    redirect: props.redirect ?? route.fullPath
+  }
+}))
 </script>
 
 <template>
-  <a :href="loginUrl"><img :src="ssoButtonUrl" /></a>
+  <RouterLink :to="loginUrl"><img :src="ssoButtonUrl" /></RouterLink>
 </template>
 
 <style scoped></style>
