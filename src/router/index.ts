@@ -1,6 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import { useTokenStore } from '@/stores/sso-token'
+import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '../views/HomeView.vue';
+import { useTokenStore } from '@/stores/sso-token';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,11 +24,14 @@ const router = createRouter({
           name: 'sso-login',
           component: HomeView,
           beforeEnter: async (to, from) => {
-            const tokenStore = useTokenStore()
-            tokenStore.clearTokens()
-            const url = await tokenStore.generateAuthUrl(to.query.scope as string, (to.query.redirect as string) || from.fullPath)
-            debugger
-            window.location.href = url
+            const tokenStore = useTokenStore();
+            tokenStore.clearTokens();
+            const url = await tokenStore.generateAuthUrl(
+              to.query.scope as string,
+              (to.query.redirect as string) || from.fullPath,
+            );
+            debugger;
+            window.location.href = url;
           },
         },
         {
@@ -36,13 +39,16 @@ const router = createRouter({
           name: 'sso-callback',
           component: HomeView,
           beforeEnter: async (to) => {
-            const tokenStore = useTokenStore()
-            return await tokenStore.callbackHandler(to.query.code as string, to.query.state as string)
+            const tokenStore = useTokenStore();
+            return await tokenStore.callbackHandler(
+              to.query.code as string,
+              to.query.state as string,
+            );
           },
-        }
-      ]
-    }
+        },
+      ],
+    },
   ],
-})
+});
 
-export default router
+export default router;
