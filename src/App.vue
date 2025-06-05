@@ -2,13 +2,16 @@
 import { RouterLink, RouterView } from 'vue-router';
 import HelloWorld from './components/HelloWorld.vue';
 import SSOLogin from './components/SSOLogin.vue';
+import EVExcel from './components/icons/IconEvexcel.vue'
+import EOL from './components/icons/IconEOLAnimated.vue'
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+    <EVExcel /><EOL />
 
     <div class="wrapper">
+
       <HelloWorld msg="You did it!" />
 
       <nav>

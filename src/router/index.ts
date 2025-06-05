@@ -30,7 +30,6 @@ const router = createRouter({
               to.query.scope as string,
               (to.query.redirect as string) || from.fullPath,
             );
-            debugger;
             window.location.href = url;
           },
         },
