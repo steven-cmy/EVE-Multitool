@@ -2,8 +2,11 @@
 import { RouterLink, RouterView } from 'vue-router';
 import HelloWorld from './components/HelloWorld.vue';
 import SSOLogin from './components/SSOLogin.vue';
-import EVExcel from './components/icons/IconEvexcel.vue'
-import EOL from './components/icons/IconEOLAnimated.vue'
+import EVExcel from './components/icons/IconEvexcel.vue';
+import EOL from './components/icons/IconEOLAnimated.vue';
+import esi from '@/services/esi';
+
+console.log(await esi);
 </script>
 
 <template>
@@ -11,7 +14,6 @@ import EOL from './components/icons/IconEOLAnimated.vue'
     <EVExcel /><EOL />
 
     <div class="wrapper">
-
       <HelloWorld msg="You did it!" />
 
       <nav>
