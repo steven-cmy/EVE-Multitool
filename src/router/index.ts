@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/TypesView.vue';
+import HomeView from '../views/esiTypes/TypesView.vue';
 import { useTokenStore } from '@/stores/sso-token';
 
 const router = createRouter({
@@ -18,12 +18,12 @@ const router = createRouter({
     {
       path: '/types',
       name: 'types',
-      component: () => import('../views/TypesView.vue'),
+      component: () => import('../views/esiTypes/TypesView.vue'),
       children: [
         // Use a custom regex to allow ':' in the typeid param
         {
           path: ':typeid',
-          component: () => import('../views/TypesView.vue'),
+          component: () => import('../views/esiTypes/TypesView.vue'),
           name: 'types-showinfo'
         },
       ]
