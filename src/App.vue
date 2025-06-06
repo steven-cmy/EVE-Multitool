@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router';
-import HelloWorld from './components/HelloWorld.vue';
+import HelloWorld from './views/HelloWorld.vue';
 import SSOLogin from './components/SSOLogin.vue';
 import EVExcel from './components/icons/IconEvexcel.vue';
 import EOL from './components/icons/IconEOLAnimated.vue';
-import esi from '@/services/esi';
-
-console.log(await esi);
 </script>
 
 <template>
   <header>
-    <EVExcel /><EOL />
+    <EVExcel />
+    <EOL />
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
@@ -19,6 +17,7 @@ console.log(await esi);
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
+        <RouterLink :to="{ name: 'types-showinfo', params: { typeid: 34 } }">Types</RouterLink>
       </nav>
 
       <SSOLogin />

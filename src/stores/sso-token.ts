@@ -160,6 +160,40 @@ export const useTokenStore = defineStore('sso-token', () => {
     }
   }
 
+  async function refreshAccessToken(): Promise<string | undefined> {
+    if (!refreshToken.value) {
+      console.error('No refresh token found');
+      clearTokens();
+      return undefined;
+    }
+    try {
+      const response = await axios.post(
+        await tokenEndpointUrl.value,
+        new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken.value,
+          client_id: import.meta.env.VITE_EVE_ESI_CLIENT_ID,
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        },
+      );
+      if (response.status === 200) {
+        accessToken.value = response.data.access_token;
+        refreshToken.value = response.data.refresh_token;
+        localStorage.setItem('sso-access-token', accessToken.value);
+        localStorage.setItem('sso-refresh-token', refreshToken.value);
+        return accessToken.value;
+      }
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      clearTokens();
+    }
+    return undefined;
+  }
+
   function clearTokens() {
     accessToken.value = '';
     refreshToken.value = '';
@@ -173,6 +207,7 @@ export const useTokenStore = defineStore('sso-token', () => {
     generateAuthUrl,
     callbackHandler,
     validateToken,
+    refreshAccessToken,
     clearTokens,
   };
 });
