@@ -17,7 +17,7 @@ import EOL from './components/icons/IconEOLAnimated.vue';
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-        <RouterLink :to="{ name: 'types-showinfo', params: { typeid: 34 } }">Types</RouterLink>
+        <RouterLink :to="{ name: 'types-list' }">Types</RouterLink>
       </nav>
 
       <SSOLogin />

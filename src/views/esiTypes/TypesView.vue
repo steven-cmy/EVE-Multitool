@@ -16,16 +16,15 @@ const icon: IMAGE = {
 
 onMounted(async () => {
   if (typeId) {
-    const res = getUniverseTypesTypeId(typeId);
-    Object.assign(type, (await res).data);
+    Object.assign(type, await getUniverseTypesTypeId(typeId));
   }
 });
 </script>
 
 <template>
-  <main v-if="$route.params.typeid">
-    <img v-if="type.type_id" :src="getImageUrl(icon)" />
+  <div v-if="$route.params.typeid">
+    <img v-if="type.type_id" :src="getImageUrl(icon)" :alt="type.name"/>
     <h1 v-if="type.name">{{ type.name }}</h1>
     <p v-if="type.description" v-html="processEVEMarkup(type.description, router)"></p>
-  </main>
+  </div>
 </template>

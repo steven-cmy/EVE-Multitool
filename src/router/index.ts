@@ -17,16 +17,15 @@ const router = createRouter({
     },
     {
       path: '/types',
-      name: 'types',
-      component: () => import('../views/esiTypes/TypesView.vue'),
+      name: 'types-list',
+      component: () => import('../views/esiTypes/TypeList.vue'),
       children: [
-        // Use a custom regex to allow ':' in the typeid param
         {
           path: ':typeid',
           component: () => import('../views/esiTypes/TypesView.vue'),
-          name: 'types-showinfo'
+          name: 'types-showinfo',
         },
-      ]
+      ],
     },
     {
       path: '/sso',
