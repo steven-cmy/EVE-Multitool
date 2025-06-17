@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { onMounted, reactive, watch } from 'vue';
 import { type IMAGE, getImageUrl } from '@/api/eis';
-import { processEVEMarkup } from '@/utils/esiUtil';
-import getUniverseTypesTypeId from '@/services/getUniverseTypesTypeId';
-
+import EVEMarkup from '@/components/EVEMarkup.vue';
+import { axiosInstance } from '@/utils/esiUtil';
+import {
+  UniverseApi,
+  Configuration,
+  GetUniverseTypesTypeIdAcceptLanguageEnum,
+  GetUniverseTypesTypeIdDatasourceEnum,
+  GetUniverseTypesTypeIdLanguageEnum,
+} from '@/api/esi';
+const { typeid } = defineProps({
+  typeid: String,
+});
 const type = reactive<{ type_id?: number; name?: string; description?: string }>({});
-const route = useRoute();
-const router = useRouter();
-const typeId = parseInt(route.params.typeid as string);
+const typeId = parseInt(typeid as string);
 const icon: IMAGE = {
   category: 'types',
   id: typeId,
@@ -16,15 +22,46 @@ const icon: IMAGE = {
 
 onMounted(async () => {
   if (typeId) {
-    Object.assign(type, await getUniverseTypesTypeId(typeId));
+    const language =
+      (localStorage.getItem('locale') as GetUniverseTypesTypeIdLanguageEnum) ??
+      GetUniverseTypesTypeIdLanguageEnum.En;
+    const acceptLanguage = language as GetUniverseTypesTypeIdAcceptLanguageEnum;
+    const datasource = GetUniverseTypesTypeIdDatasourceEnum.Tranquility;
+    const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
+    Object.assign(
+      type,
+      (await api.getUniverseTypesTypeId(typeId, acceptLanguage, datasource, undefined, language))
+        .data,
+    );
   }
 });
+
+watch(
+  () => typeid,
+  async (newId) => {
+    console.log(newId);
+    if (typeId) {
+      const language =
+        (localStorage.getItem('locale') as GetUniverseTypesTypeIdLanguageEnum) ??
+        GetUniverseTypesTypeIdLanguageEnum.En;
+      const acceptLanguage = language as GetUniverseTypesTypeIdAcceptLanguageEnum;
+      const datasource = GetUniverseTypesTypeIdDatasourceEnum.Tranquility;
+      const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
+      Object.assign(
+        type,
+        (await api.getUniverseTypesTypeId(typeId, acceptLanguage, datasource, undefined, language))
+          .data,
+      );
+    }
+  },
+);
 </script>
 
 <template>
-  <div v-if="$route.params.typeid">
-    <img v-if="type.type_id" :src="getImageUrl(icon)" :alt="type.name"/>
+  <main v-if="type.type_id">
+    <img v-if="type.type_id" :src="getImageUrl(icon)" :alt="type.name" />
     <h1 v-if="type.name">{{ type.name }}</h1>
-    <p v-if="type.description" v-html="processEVEMarkup(type.description, router)"></p>
-  </div>
+    <p><EVEMarkup :html="type.description" /></p>
+    <!-- <p v-if="type.description" v-html="processEVEMarkup(type.description, router)"></p> -->
+  </main>
 </template>

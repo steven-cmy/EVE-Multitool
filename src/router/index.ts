@@ -17,13 +17,18 @@ const router = createRouter({
     },
     {
       path: '/types',
-      name: 'types-list',
-      component: () => import('../views/esiTypes/TypeList.vue'),
+      component: () => import('../views/esiTypes/Types.vue'),
       children: [
+        {
+          path: '',
+          component: () => import('../views/esiTypes/TypeList.vue'),
+          name: 'types-list',
+        },
         {
           path: ':typeid',
           component: () => import('../views/esiTypes/TypesView.vue'),
           name: 'types-showinfo',
+          props: true,
         },
       ],
     },
