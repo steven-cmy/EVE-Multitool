@@ -1,8 +1,29 @@
-import axios, { type AxiosResponseHeaders, type RawAxiosResponseHeaders } from 'axios';
+import axios, {
+  type AxiosResponseHeaders,
+  type InternalAxiosRequestConfig,
+  type RawAxiosResponseHeaders,
+} from 'axios';
+import Dexie, { type EntityTable } from 'dexie';
 
 export const axiosInstance = axios.create();
 
-const cache = new Map();
+interface ESIQuery {
+  query: string;
+  data: object;
+  headers: {
+    etag: string;
+    expires: Date;
+    [key: string]: unknown;
+  };
+}
+
+const db = new Dexie('EVEMultitool') as Dexie & {
+  entries: EntityTable<ESIQuery, 'query'>;
+};
+db.version(1).stores({
+  entries: 'query',
+});
+const cache = db.table('entries');
 
 // ESI Error Limit state
 let errorLimitRemaining: number = NaN;
@@ -43,7 +64,17 @@ const updateErrorLimitState = (headers: RawAxiosResponseHeaders | AxiosResponseH
   }
 };
 
-axiosInstance.interceptors.request.use((config) => {
+const getQuery = (config: InternalAxiosRequestConfig<unknown>) => {
+  if (config.method === 'get') {
+    const params = new URLSearchParams(config.params ? config.params : {}).toString();
+    return params ? `${config.url}?${params}` : `${config.url}`;
+  } else if (config.method === 'post') {
+    return `${config.url}?${JSON.stringify(config.data)}`;
+  }
+  return `${config.url}`;
+};
+
+axiosInstance.interceptors.request.use(async (config) => {
   // Check error limit before making any request
   if (shouldBlockRequest()) {
     const secondsUntilReset = Math.ceil((errorLimitResetTime - Date.now()) / 1000);
@@ -54,17 +85,12 @@ axiosInstance.interceptors.request.use((config) => {
       retryAfterSeconds: secondsUntilReset,
     });
   }
-  let cacheKey;
-  if (config.method === 'get') {
-    cacheKey = `${config.url}?${JSON.stringify(config.params)}`;
-  } else if (config.method === 'post') {
-    cacheKey = `${config.url}?${JSON.stringify(config.data)}`;
-  }
-  const cached = cache.get(cacheKey);
+  const cacheKey = getQuery(config);
+  const cached = await cache.get(cacheKey);
 
   if (cached) {
-    config.headers.set('If-None-Match', cached.etag);
-    if (new Date(cached.expireOn) > new Date()) {
+    config.headers.set('If-None-Match', cached.headers.etag);
+    if (new Date(cached.headers.expires) > new Date()) {
       // Return cached response
       return Promise.reject({
         __cached: true,
@@ -72,32 +98,26 @@ axiosInstance.interceptors.request.use((config) => {
       });
     }
   }
-
   return config;
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => {
+  async (response) => {
     // Update error limit state from all responses
     updateErrorLimitState(response.headers);
 
     // Handle 304 Not Modified
     if (response.status === 304) {
-      const method = response.config.method;
-      let cacheKey;
+      const cacheKey = getQuery(response.config);
 
-      if (method === 'get') {
-        cacheKey = `${response.config.url}?${JSON.stringify(response.config.params)}`;
-      } else if (method === 'post') {
-        cacheKey = `${response.config.url}?${JSON.stringify(response.config.data)}`;
-      }
-
-      const cached = cache.get(cacheKey);
+      const cached = await cache.get(cacheKey);
       if (cached) {
         // Update expiration if provided in 304 response
         if (response.headers.expires) {
-          cached.expireOn = response.headers.expires;
-          cache.set(cacheKey, cached);
+          cached.headers.expires = response.headers.expires;
+          cache.update(cacheKey, (entry) => {
+            entry.headers.expires = new Date(response.headers.expires);
+          });
         }
         console.log('Cache HIT!(304)');
         // Return cached data with 200 status
@@ -106,7 +126,7 @@ axiosInstance.interceptors.response.use(
           status: 200,
           statusText: 'OK',
           headers: {
-            ...cached.data.headers,
+            ...cached.headers,
             ...response.headers, // Merge any updated headers from 304 response
           },
         };
@@ -114,20 +134,23 @@ axiosInstance.interceptors.response.use(
     }
 
     // Cache responses
-    let cacheKey;
-    if (response.config.method === 'get') {
-      cacheKey = `${response.config.url}?${JSON.stringify(response.config.params)}`;
-    } else if (response.config.method === 'post') {
-      cacheKey = `${response.config.url}?${JSON.stringify(response.config.data)}`;
-    }
-    cache.set(cacheKey, response);
+    const cacheKey = getQuery(response.config);
+    cache.put({
+      query: cacheKey,
+      data: response.data,
+      headers: response.headers,
+    });
     return response;
   },
   (error) => {
     // Handle special error cases first
     if (error.__cached) {
       console.log('Cache HIT!');
-      return Promise.resolve({ data: error.data });
+      return Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: error.data,
+      });
     }
 
     if (error.__errorLimitExceeded) {

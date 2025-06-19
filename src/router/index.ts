@@ -17,7 +17,7 @@ const router = createRouter({
     },
     {
       path: '/types',
-      component: () => import('../views/esiTypes/Types.vue'),
+      component: () => import('../views/esiTypes/esiTypes.vue'),
       children: [
         {
           path: '',
