@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import { type IMAGE, getImageUrl } from '@/api/eis';
 import EVEMarkup from '@/components/EVEMarkup.vue';
 import { axiosInstance } from '@/utils/esiUtil';
@@ -10,15 +10,18 @@ import {
   GetUniverseTypesTypeIdDatasourceEnum,
   GetUniverseTypesTypeIdLanguageEnum,
 } from '@/api/esi';
+import { NSkeleton } from 'naive-ui';
+
 const { typeid } = defineProps({
   typeid: String,
 });
+const loading = ref(true);
 const type = reactive<{ type_id?: number; name?: string; description?: string }>({});
 const typeId = parseInt(typeid as string);
-const icon: IMAGE = {
+const icon = reactive<IMAGE>({
   category: 'types',
   id: typeId,
-};
+});
 
 onMounted(async () => {
   if (typeId) {
@@ -33,14 +36,17 @@ onMounted(async () => {
       (await api.getUniverseTypesTypeId(typeId, acceptLanguage, datasource, undefined, language))
         .data,
     );
+    loading.value = false;
   }
 });
 
 watch(
   () => typeid,
   async (newId) => {
-    console.log(newId);
-    if (typeId) {
+    const newTypeId = parseInt(newId as string);
+    if (newTypeId) {
+      loading.value = true;
+      icon.id = newTypeId;
       const language =
         (localStorage.getItem('locale') as GetUniverseTypesTypeIdLanguageEnum) ??
         GetUniverseTypesTypeIdLanguageEnum.En;
@@ -49,19 +55,32 @@ watch(
       const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
       Object.assign(
         type,
-        (await api.getUniverseTypesTypeId(typeId, acceptLanguage, datasource, undefined, language))
-          .data,
+        (
+          await api.getUniverseTypesTypeId(
+            newTypeId,
+            acceptLanguage,
+            datasource,
+            undefined,
+            language,
+          )
+        ).data,
       );
+      loading.value = false;
     }
   },
 );
 </script>
 
 <template>
-  <main v-if="type.type_id">
-    <img v-if="type.type_id" :src="getImageUrl(icon)" :alt="type.name" />
-    <h1 v-if="type.name">{{ type.name }}</h1>
-    <p><EVEMarkup :html="type.description" /></p>
+  <main>
+    <n-skeleton height="64px" width="64px" v-if="loading" />
+    <img v-else :src="getImageUrl(icon)" :alt="type.name" />
+    <h1>
+      <n-skeleton v-if="loading" text style="width: 30%" />
+      <span v-else>{{ type.name }}</span>
+    </h1>
+    <p v-if="loading"><n-skeleton text :repeat="2" /> <n-skeleton text style="width: 60%" /></p>
+    <p v-else><EVEMarkup :html="type.description" /></p>
     <!-- <p v-if="type.description" v-html="processEVEMarkup(type.description, router)"></p> -->
   </main>
 </template>
