@@ -4,6 +4,7 @@ import HelloWorld from './views/HelloWorld.vue';
 import SSOLogin from './components/SSOLogin.vue';
 import EVExcel from './components/icons/IconEvexcel.vue';
 import EOL from './components/icons/IconEOLAnimated.vue';
+import LanguageSwitch from './components/LanguageSwitch.vue';
 </script>
 
 <template>
@@ -21,6 +22,7 @@ import EOL from './components/icons/IconEOLAnimated.vue';
       </nav>
 
       <SSOLogin />
+      <LanguageSwitch />
     </div>
   </header>
 
