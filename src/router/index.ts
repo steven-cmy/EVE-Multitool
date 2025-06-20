@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/esiTypes/TypesView.vue';
 import { useTokenStore } from '@/stores/sso-token';
 
 const router = createRouter({
@@ -8,7 +7,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: () => import('../views/HomeView.vue'),
     },
     {
       path: '/about',
@@ -39,7 +38,7 @@ const router = createRouter({
         {
           path: 'login',
           name: 'sso-login',
-          component: HomeView,
+          component: () => import('../views/SSOView.vue'),
           beforeEnter: async (to, from) => {
             const tokenStore = useTokenStore();
             tokenStore.clearTokens();
@@ -53,7 +52,7 @@ const router = createRouter({
         {
           path: 'callback',
           name: 'sso-callback',
-          component: HomeView,
+          component: () => import('../views/SSOView.vue'),
           beforeEnter: async (to) => {
             const tokenStore = useTokenStore();
             return await tokenStore.callbackHandler(

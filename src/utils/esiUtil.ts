@@ -106,9 +106,31 @@ axiosInstance.interceptors.response.use(
     // Update error limit state from all responses
     updateErrorLimitState(response.headers);
 
-    // Handle 304 Not Modified
-    if (response.status === 304) {
+    // Cache responses
+    const cacheKey = getQuery(response.config);
+    cache.put({
+      query: cacheKey,
+      data: response.data,
+      headers: response.headers,
+    });
+    return response;
+  },
+  async (error) => {
+    // Handle special error cases first
+    if (error.__cached) {
+      console.log('Cache HIT!');
+      return Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: error.data,
+      });
+    }
+
+    if (error.status === 304) {
+      const response = error.response;
       const cacheKey = getQuery(response.config);
+
+      updateErrorLimitState(response.headers);
 
       const cached = await cache.get(cacheKey);
       if (cached) {
@@ -121,36 +143,16 @@ axiosInstance.interceptors.response.use(
         }
         console.log('Cache HIT!(304)');
         // Return cached data with 200 status
-        return {
-          ...cached.data,
+        return Promise.resolve({
+          data: cached.data,
           status: 200,
           statusText: 'OK',
           headers: {
             ...cached.headers,
             ...response.headers, // Merge any updated headers from 304 response
           },
-        };
+        });
       }
-    }
-
-    // Cache responses
-    const cacheKey = getQuery(response.config);
-    cache.put({
-      query: cacheKey,
-      data: response.data,
-      headers: response.headers,
-    });
-    return response;
-  },
-  (error) => {
-    // Handle special error cases first
-    if (error.__cached) {
-      console.log('Cache HIT!');
-      return Promise.resolve({
-        status: 200,
-        statusText: 'OK',
-        data: error.data,
-      });
     }
 
     if (error.__errorLimitExceeded) {

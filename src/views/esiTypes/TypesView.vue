@@ -31,12 +31,12 @@ onMounted(async () => {
     const acceptLanguage = language as GetUniverseTypesTypeIdAcceptLanguageEnum;
     const datasource = GetUniverseTypesTypeIdDatasourceEnum.Tranquility;
     const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
-    Object.assign(
-      type,
-      (await api.getUniverseTypesTypeId(typeId, acceptLanguage, datasource, undefined, language))
-        .data,
-    );
-    loading.value = false;
+    const data = (
+      await api.getUniverseTypesTypeId(typeId, acceptLanguage, datasource, undefined, language)
+    ).data;
+    Object.assign(type, data);
+    console.log(type);
+    loading.value = Object.keys(type).length === 0;
   }
 });
 
@@ -53,19 +53,12 @@ watch(
       const acceptLanguage = language as GetUniverseTypesTypeIdAcceptLanguageEnum;
       const datasource = GetUniverseTypesTypeIdDatasourceEnum.Tranquility;
       const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
-      Object.assign(
-        type,
-        (
-          await api.getUniverseTypesTypeId(
-            newTypeId,
-            acceptLanguage,
-            datasource,
-            undefined,
-            language,
-          )
-        ).data,
-      );
-      loading.value = false;
+      const data = (
+        await api.getUniverseTypesTypeId(newTypeId, acceptLanguage, datasource, undefined, language)
+      ).data;
+      Object.assign(type, data);
+      console.log(type);
+      loading.value = Object.keys(type).length === 0;
     }
   },
 );
