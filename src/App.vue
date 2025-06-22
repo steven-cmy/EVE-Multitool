@@ -5,28 +5,38 @@ import SSOLogin from './components/SSOLogin.vue';
 import EVExcel from './components/icons/IconEvexcel.vue';
 import EOL from './components/icons/IconEOLAnimated.vue';
 import LanguageSwitch from './components/LanguageSwitch.vue';
+import { computed } from 'vue';
+import { NConfigProvider, darkTheme, lightTheme } from 'naive-ui';
+import LightSwitch from './components/LightSwitch.vue';
+import { useDarkmodeStore } from '@/stores/DarkmodeStore';
+
+const darkmodeStore = useDarkmodeStore();
+const theme = computed(() => (darkmodeStore.isDarkmode() ? darkTheme : lightTheme));
 </script>
 
 <template>
-  <header>
-    <EVExcel />
-    <EOL />
+  <n-config-provider :theme="theme">
+    <header>
+      <EVExcel />
+      <EOL />
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <div class="wrapper">
+        <HelloWorld msg="You did it!" />
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-        <RouterLink :to="{ name: 'types-list' }">Types</RouterLink>
-      </nav>
+        <nav>
+          <RouterLink to="/">Home</RouterLink>
+          <RouterLink to="/about">About</RouterLink>
+          <RouterLink :to="{ name: 'types-list' }">Types</RouterLink>
+        </nav>
 
-      <SSOLogin />
-      <LanguageSwitch />
-    </div>
-  </header>
+        <SSOLogin />
+        <LanguageSwitch />
+        <LightSwitch />
+      </div>
+    </header>
 
-  <RouterView />
+    <RouterView />
+  </n-config-provider>
 </template>
 
 <style scoped>

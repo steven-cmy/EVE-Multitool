@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { type IMAGE, getImageUrl } from '@/api/eis';
 import EVEMarkup from '@/components/EVEMarkup.vue';
 import { axiosInstance } from '@/utils/esiUtil';
@@ -24,20 +24,6 @@ const icon = reactive<IMAGE>({
   id: typeId,
 });
 const i18n = useI18n();
-const locale = ref(i18n.locale.value as GetUniverseTypesTypeIdLanguageEnum);
-
-onMounted(async () => {
-  if (typeId) {
-    const acceptLanguage = locale.value as GetUniverseTypesTypeIdAcceptLanguageEnum;
-    const datasource = GetUniverseTypesTypeIdDatasourceEnum.Tranquility;
-    const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
-    const data = (
-      await api.getUniverseTypesTypeId(typeId, acceptLanguage, datasource, undefined, locale.value as GetUniverseTypesTypeIdLanguageEnum)
-    ).data;
-    Object.assign(type, data);
-    loading.value = Object.keys(type).length === 0;
-  }
-});
 
 watch(
   [() => typeid, () => i18n.locale.value],
@@ -51,12 +37,19 @@ watch(
       const datasource = GetUniverseTypesTypeIdDatasourceEnum.Tranquility;
       const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
       const data = (
-        await api.getUniverseTypesTypeId(newTypeId, acceptLanguage, datasource, undefined, newLocale as GetUniverseTypesTypeIdLanguageEnum)
+        await api.getUniverseTypesTypeId(
+          newTypeId,
+          acceptLanguage,
+          datasource,
+          undefined,
+          newLocale as GetUniverseTypesTypeIdLanguageEnum,
+        )
       ).data;
       Object.assign(type, data);
       loading.value = Object.keys(type).length === 0;
     }
   },
+  { immediate: true },
 );
 </script>
 
@@ -64,9 +57,11 @@ watch(
   <main>
     <n-skeleton height="64px" width="64px" v-if="loading" />
     <img v-else :src="getImageUrl(icon)" :alt="type.name" />
-    <h1>
-      <n-skeleton v-if="loading" text style="width: 30%" />
-      <span v-else>{{ type.name }}</span>
+    <h1 v-if="loading">
+      <n-skeleton text style="width: 30%" />
+    </h1>
+    <h1 v-else>
+      <span>{{ type.name }}</span>
     </h1>
     <p v-if="loading"><n-skeleton text :repeat="2" /> <n-skeleton text style="width: 60%" /></p>
     <p v-else>
