@@ -1,12 +1,13 @@
 name: CI
 on:
-  push:
-    branches: [main, master, develop]
-  pull_request:
+  workflow_run:
+    workflows: ["Lint"]  # Name from the first workflow
+    types: completed
     branches: [main, master, develop]
 jobs:
-  build:
-    name: Build
+  unittest:
+    name: Unit Tests
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,18 +18,12 @@ jobs:
         run: npm ci
       - name: Build the project
         run: npm run build
-  unittest:
-    name: Unit Tests
-    needs: build
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    steps:
       - name: Run Vitest unit tests
         run: npm run test:unit
 
   e2etest:
     name: End-to-end Tests
-    needs: [build, unittest]
+    needs: unittest
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:

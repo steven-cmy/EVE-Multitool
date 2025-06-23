@@ -4,8 +4,7 @@ on:
   pull_request:
   workflow_run:
     workflows: ["ESI API Generator"]
-    types:
-      - completed
+    types: completed
 
 jobs:
   lint:
