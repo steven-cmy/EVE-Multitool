@@ -5,9 +5,8 @@ on:
     types: completed
     branches: [main, master, develop]
 jobs:
-  unittest:
-    name: Unit Tests
-    timeout-minutes: 60
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,12 +17,18 @@ jobs:
         run: npm ci
       - name: Build the project
         run: npm run build
+  unittest:
+    name: Unit Tests
+    needs: build
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
       - name: Run Vitest unit tests
         run: npm run test:unit
 
   e2etest:
     name: End-to-end Tests
-    needs: unittest
+    needs: [build, unittest]
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
