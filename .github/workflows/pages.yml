@@ -3,7 +3,7 @@ name: Deploy static content to Pages
 
 on:
   workflow_run:
-    workflows: ['Unit Tests and E2E Test']
+    workflows: ['Tests']
     types: completed
     branches: master
 
