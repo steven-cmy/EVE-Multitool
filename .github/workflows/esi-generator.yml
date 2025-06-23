@@ -3,7 +3,7 @@ on:
   # push:
   #   branches: ['**'] # Matches any branch
   schedule:
-    - cron: '0 11 * * *' # Runs at 11:00 UTC daily
+    - cron: '5 11 * * *' # Runs at 11:05 UTC daily
   workflow_dispatch: # Allow manual triggering
 
 permissions:
@@ -23,15 +23,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-
+      - name: Install dependencies
+        run: npm ci
       - name: Install OpenAPI Generator
         run: |
           npm install @openapitools/openapi-generator-cli -g
-
       - name: Download OpenAPI specification
         run: |
           curl https://esi.evetech.net/latest/swagger.json -o swagger.json
-
       - name: Generate API Client
         run: |
           openapi-generator-cli generate \
@@ -40,7 +39,6 @@ jobs:
             -o src/api/esi \
             --minimal-update \
             --additional-properties=supportsES6=true,npmName=eve-esi-client,npmVersion=1.0.0
-
       - name: Commit and Push Changes
         run: |
           echo "Current branch: ${GITHUB_REF#refs/heads/}"
