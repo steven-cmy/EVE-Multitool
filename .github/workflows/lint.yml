@@ -6,8 +6,6 @@ on:
 
 jobs:
   lint:
-    # 如果是由 ESI Generator 触发的，则只在 ESI Generator 成功时运行
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     name: Lint Code
     runs-on: ubuntu-latest
     steps:
