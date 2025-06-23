@@ -11,7 +11,7 @@ import {
   GetUniverseTypesTypeIdLanguageEnum,
 } from '@/api/esi';
 import { NSkeleton } from 'naive-ui';
-import { useI18n } from 'vue-i18n';
+import { useLanguageStore } from '@/stores/LanguageStore';
 
 const { typeid } = defineProps({
   typeid: String,
@@ -23,10 +23,10 @@ const icon = reactive<IMAGE>({
   category: 'types',
   id: typeId,
 });
-const i18n = useI18n();
+const langStore = useLanguageStore();
 
 watch(
-  [() => typeid, () => i18n.locale.value],
+  [() => typeid, () => langStore.getLocale()],
   async ([newId, newLocale]) => {
     const newTypeId = parseInt(newId as string);
     // Only trigger if typeid or locale actually changed

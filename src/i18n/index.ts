@@ -24,8 +24,6 @@ export const getLocale = () => {
   );
 };
 
-localStorage.setItem('locale', getLocale());
-
 const i18n = createI18n({
   legacy: false, // Use Composition API mode
   locale: getLocale(), // Default locale from browser
