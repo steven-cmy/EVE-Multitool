@@ -5,7 +5,7 @@ import axios from 'axios';
 import pkceChallenge from 'pkce-challenge';
 import * as jose from 'jose';
 
-export const useTokenStore = defineStore('sso-token', () => {
+export const useTokenStore = defineStore('TokenStore', () => {
   interface AuthServerSpec {
     authorization_endpoint?: string;
     token_endpoint?: string;

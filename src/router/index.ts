@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useTokenStore } from '@/stores/sso-token';
+import { useTokenStore } from '@/stores/TokenStore';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

@@ -1,21 +1,18 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { useDarkmodeStore } from '@/stores/DarkmodeStore';
+import { computed } from 'vue';
 import { useRoute, RouterLink } from 'vue-router';
 
 const route = useRoute();
 
-const isDarkMode = ref(window.matchMedia('(prefers-color-scheme: dark)').matches);
+const darkmodeStore = useDarkmodeStore();
 const color = computed(() => {
-  if (props.dark || isDarkMode.value) {
+  if (props.dark || darkmodeStore.isDarkmode()) {
     return 'black';
   } else {
     return 'white';
   }
 });
-
-window
-  .matchMedia('(prefers-color-scheme: dark)')
-  .addEventListener('change', (e) => (isDarkMode.value = e.matches));
 
 const ssoButtonUrl = computed(() => {
   return `https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-${color.value}-${props.size}.png`;
@@ -31,6 +28,8 @@ const props = withDefaults(
   {
     scope: 'publicData',
     size: 'large',
+    redirect: '',
+    dark: false,
   },
 );
 
@@ -44,7 +43,7 @@ const loginUrl = computed(() => ({
 </script>
 
 <template>
-  <RouterLink :to="loginUrl"><img :src="ssoButtonUrl" alt="EVE Online SSO Log-in"/></RouterLink>
+  <RouterLink :to="loginUrl"><img :src="ssoButtonUrl" alt="EVE Online SSO Log-in" /></RouterLink>
 </template>
 
 <style scoped></style>

@@ -1,8 +1,8 @@
 name: CI
 on:
-  push:
-    branches: [main, master, develop]
-  pull_request:
+  workflow_run:
+    workflows: ["Lint"]  # Name from the first workflow
+    types: completed
     branches: [main, master, develop]
 jobs:
   unittest:
