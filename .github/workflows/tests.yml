@@ -3,7 +3,7 @@ on:
   workflow_run:
     workflows: ['Lint']
     types: [completed]
-    branches: ['**']
+    branches: [main, master, develop]
   workflow_dispatch:
 jobs:
   unittest:
