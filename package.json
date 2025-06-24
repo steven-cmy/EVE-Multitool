@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test:unit": "vitest",
     "test:e2e": "playwright test",
-    "build-only": "vite build --base=./",
+    "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
