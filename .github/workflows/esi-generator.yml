@@ -39,6 +39,7 @@ jobs:
             -o src/api/esi \
             --minimal-update \
             --additional-properties=supportsES6=true,npmName=eve-esi-client,npmVersion=1.0.0
+
       - name: Commit and Push Changes
         run: |
           echo "Current branch: ${GITHUB_REF#refs/heads/}"
