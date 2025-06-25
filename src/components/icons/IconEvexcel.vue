@@ -1,3 +1,15 @@
+<script setup lang="ts">
+const { height, width } = withDefaults(
+  defineProps<{
+    height?: string;
+    width?: string;
+  }>(),
+  {
+    height: '100%',
+  },
+);
+</script>
+
 <template>
   <svg
     id="EVExcel"
@@ -6,6 +18,8 @@
     version="1.1"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     viewBox="0 0 2289.8 2289.8"
+    :height="height"
+    :width="width"
   >
     <defs>
       <linearGradient

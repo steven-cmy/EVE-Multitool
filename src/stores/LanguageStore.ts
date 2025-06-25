@@ -5,8 +5,12 @@ export const useLanguageStore = defineStore('LanguageStore', () => {
   const i18n = useI18n();
 
   function setLocale(newLocale: string) {
-    localStorage.setItem('locale', newLocale);
-    i18n.locale.value = newLocale;
+    if (newLocale !== i18n.locale.value) {
+      localStorage.setItem('locale', newLocale);
+      i18n.locale.value = newLocale;
+    }
+    const h = document.querySelector('html');
+    h?.setAttribute('lang', newLocale);
   }
 
   const getLocale = () => i18n.locale.value;

@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router';
-import HelloWorld from './views/HelloWorld.vue';
-import SSOLogin from './components/SSOLogin.vue';
-import EVExcel from './components/icons/IconEvexcel.vue';
-import EOL from './components/icons/IconEOLAnimated.vue';
-import LanguageSwitch from './components/LanguageSwitch.vue';
+import SSOLogin from '@/components/SSOLogin.vue';
+import EVExcel from '@/components/icons/IconEvexcel.vue';
+import LanguageSwitch from '@/components/LanguageSwitch.vue';
 import { computed } from 'vue';
-import { NConfigProvider, darkTheme, lightTheme } from 'naive-ui';
-import LightSwitch from './components/LightSwitch.vue';
+import {
+  NConfigProvider,
+  NGlobalStyle,
+  darkTheme,
+  lightTheme,
+  NLayout,
+  NLayoutHeader,
+  NLayoutFooter,
+  NFlex,
+  NImage,
+} from 'naive-ui';
+import LightSwitch from '@/components/LightSwitch.vue';
 import { useDarkmodeStore } from '@/stores/DarkmodeStore';
 
 const darkmodeStore = useDarkmodeStore();
@@ -16,30 +24,46 @@ const theme = computed(() => (darkmodeStore.isDarkmode() ? darkTheme : lightThem
 
 <template>
   <n-config-provider :theme="theme">
-    <header>
-      <EVExcel />
-      <EOL />
-
-      <div class="wrapper">
-        <HelloWorld msg="You did it!" />
-
+    <n-layout position="absolute">
+      <n-layout-header bordered>
+        <EVExcel />
         <nav>
           <RouterLink to="/">Home</RouterLink>
           <RouterLink to="/about">About</RouterLink>
-          <RouterLink :to="{ name: 'types-list' }">Types</RouterLink>
+          <RouterLink :to="{ name: 'types-list' }">Types</RouterLink><SSOLogin />
         </nav>
-
         <SSOLogin />
         <LanguageSwitch />
         <LightSwitch />
-      </div>
-    </header>
-
-    <RouterView />
+      </n-layout-header>
+      <n-layout id="main" position="absolute">
+        <RouterView />
+      </n-layout>
+      <n-layout-footer bordered position="absolute" style="height: 64px; padding: 24px">
+        城府路
+      </n-layout-footer>
+    </n-layout>
+    <n-global-style />
   </n-config-provider>
 </template>
 
+<style>
+:root {
+  --header-height: clamp(50px, 8vh, 100px);
+}
+</style>
+
 <style scoped>
+.n-layout-header {
+  height: var(--header-height);
+  padding: 1vh;
+}
+
+.n-layout#main {
+  top: var(--header-height);
+}
+
+/* Commented out styles
 header {
   line-height: 1.5;
   max-height: 100vh;
@@ -100,5 +124,5 @@ nav a:first-of-type {
     padding: 1rem 0;
     margin-top: 1rem;
   }
-}
+} */
 </style>

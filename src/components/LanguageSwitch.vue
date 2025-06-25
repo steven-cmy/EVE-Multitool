@@ -12,7 +12,11 @@ import { useLanguageStore } from '@/stores/LanguageStore';
 const langStore = useLanguageStore();
 const locale = ref(langStore.getLocale());
 
-watch(locale, (newLocale) => {
-  langStore.setLocale(newLocale);
-});
+watch(
+  locale,
+  (newLocale) => {
+    langStore.setLocale(newLocale);
+  },
+  { immediate: true },
+);
 </script>
