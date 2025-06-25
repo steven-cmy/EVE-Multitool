@@ -2,14 +2,14 @@
 import { reactive, ref, watch } from 'vue';
 import { type IMAGE, getImageUrl } from '@/api/eis';
 import EVEMarkup from '@/components/EVEMarkup.vue';
-import { axiosInstance } from '@/utils/esiUtil';
+import { axiosInstance } from '@/api/esi';
 import {
   UniverseApi,
   Configuration,
   GetUniverseTypesTypeIdAcceptLanguageEnum,
   GetUniverseTypesTypeIdDatasourceEnum,
   GetUniverseTypesTypeIdLanguageEnum,
-} from '@/api/esi';
+} from 'eve-esi-client-ts'
 import { NSkeleton } from 'naive-ui';
 import { useLanguageStore } from '@/stores/LanguageStore';
 
