@@ -26,7 +26,7 @@ const icon = reactive<IMAGE>({
 const langStore = useLanguageStore();
 
 watch(
-  [() => typeid, () => langStore.getLocale()],
+  [() => typeid, () => langStore.getShortLocale()],
   async ([newId, newLocale]) => {
     const newTypeId = parseInt(newId as string);
     // Only trigger if typeid or locale actually changed

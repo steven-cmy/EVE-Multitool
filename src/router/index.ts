@@ -46,7 +46,7 @@ const router = createRouter({
               to.query.scope as string,
               (to.query.redirect as string) || from.fullPath,
             );
-            window.location.href = url;
+            window.location.replace(url);
           },
         },
         {

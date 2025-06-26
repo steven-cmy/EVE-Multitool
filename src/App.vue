@@ -3,7 +3,7 @@ import { RouterLink, RouterView } from 'vue-router';
 import SSOLogin from '@/components/SSOLogin.vue';
 import EVExcel from '@/components/icons/IconEvexcel.vue';
 import LanguageSwitch from '@/components/LanguageSwitch.vue';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import {
   NConfigProvider,
   NGlobalStyle,
@@ -13,34 +13,59 @@ import {
   NLayoutHeader,
   NLayoutFooter,
   NFlex,
-  NImage,
+  NGi,
+  NGrid,
 } from 'naive-ui';
 import LightSwitch from '@/components/LightSwitch.vue';
 import { useDarkmodeStore } from '@/stores/DarkmodeStore';
+import { useLanguageStore } from '@/stores/LanguageStore';
 
+const langStore = useLanguageStore();
 const darkmodeStore = useDarkmodeStore();
 const theme = computed(() => (darkmodeStore.isDarkmode() ? darkTheme : lightTheme));
+const localeRef = ref(langStore.getLocale());
+const loc = ref();
+const dLoc = ref();
+
+watch(
+  localeRef,
+  async () => {
+    const { locale, dateLocale } = await langStore.getUILocales();
+    loc.value = locale;
+    dLoc.value = dateLocale;
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
-  <n-config-provider :theme="theme">
+  <n-config-provider :theme="theme" :locale="loc" :date-locale="dLoc">
     <n-layout position="absolute">
       <n-layout-header bordered>
-        <EVExcel />
-        <nav>
-          <RouterLink to="/">Home</RouterLink>
-          <RouterLink to="/about">About</RouterLink>
-          <RouterLink :to="{ name: 'types-list' }">Types</RouterLink><SSOLogin />
-        </nav>
-        <SSOLogin />
-        <LanguageSwitch />
-        <LightSwitch />
+        <n-grid x-gap="12" cols="12" item-responsive responsive="screen">
+          <n-gi span="0 m:1 l:2">
+            <EVExcel size="calc(var(--header-height) - 2 * var(--header-padding))" />
+          </n-gi>
+          <n-gi span="6 m:6 l:5">
+            <nav>
+              <RouterLink to="/">Home</RouterLink>
+              <RouterLink :to="{ name: 'types-list' }">Types</RouterLink>
+            </nav>
+          </n-gi>
+          <n-gi span="6 m:5 l:5">
+            <n-flex justify="end" align="center">
+              <SSOLogin />
+              <LanguageSwitch />
+              <LightSwitch />
+            </n-flex>
+          </n-gi>
+        </n-grid>
       </n-layout-header>
       <n-layout id="main" position="absolute">
         <RouterView />
       </n-layout>
-      <n-layout-footer bordered position="absolute" style="height: 64px; padding: 24px">
-        城府路
+      <n-layout-footer bordered position="absolute">
+        <RouterLink to="/about">About</RouterLink>
       </n-layout-footer>
     </n-layout>
     <n-global-style />
@@ -49,80 +74,33 @@ const theme = computed(() => (darkmodeStore.isDarkmode() ? darkTheme : lightThem
 
 <style>
 :root {
-  --header-height: clamp(50px, 8vh, 100px);
+  --header-height: clamp(50px, 8vw, 100px);
+  --header-padding: 1vw;
+  --footer-height: clamp(50px, 8vw, 100px);
 }
 </style>
 
 <style scoped>
+.n-layout {
+  font-family: 'Eve Sans Neue', sans-serif;
+}
+
 .n-layout-header {
   height: var(--header-height);
-  padding: 1vh;
+  padding: var(--header-padding);
 }
 
 .n-layout#main {
   top: var(--header-height);
+  bottom: var(--footer-height);
 }
 
-/* Commented out styles
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+.n-layout-footer {
+  height: var(--footer-height);
+  padding: 1vh;
+  font-family:
+    Triglavian,
+    Eve Sans Neue,
+    sans-serif;
 }
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-} */
 </style>
