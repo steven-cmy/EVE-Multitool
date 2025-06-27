@@ -15,6 +15,8 @@ import {
   NFlex,
   NGi,
   NGrid,
+  type NLocale,
+  type NDateLocale,
 } from 'naive-ui';
 import LightSwitch from '@/components/LightSwitch.vue';
 import { useDarkmodeStore } from '@/stores/DarkmodeStore';
@@ -23,16 +25,15 @@ import { useLanguageStore } from '@/stores/LanguageStore';
 const langStore = useLanguageStore();
 const darkmodeStore = useDarkmodeStore();
 const theme = computed(() => (darkmodeStore.isDarkmode() ? darkTheme : lightTheme));
-const localeRef = ref(langStore.getLocale());
-const loc = ref();
-const dLoc = ref();
+const loc = ref<NLocale | null>(null);
+const dLoc = ref<NDateLocale | null>(null);
 
 watch(
-  localeRef,
-  async () => {
-    const { locale, dateLocale } = await langStore.getUILocales();
-    loc.value = locale;
-    dLoc.value = dateLocale;
+  () => langStore.getLocale(),
+  (newLocale) => {
+    const { locale, dateLocale } = langStore.getUILocales()[newLocale];
+    loc.value = locale as NLocale;
+    dLoc.value = dateLocale as NDateLocale;
   },
   { immediate: true },
 );

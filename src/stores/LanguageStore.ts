@@ -1,5 +1,8 @@
+import type { NDateLocale, NLocale } from 'naive-ui';
 import { defineStore } from 'pinia';
 import { useI18n } from 'vue-i18n';
+
+const naiveUI = await import('naive-ui');
 
 export const useLanguageStore = defineStore('LanguageStore', () => {
   const i18n = useI18n();
@@ -19,10 +22,8 @@ export const useLanguageStore = defineStore('LanguageStore', () => {
   const getLocale = () => i18n.locale.value;
   const getShortLocale = () => short(i18n.locale.value);
   const getDenseLocale = () => dense(i18n.locale.value);
-  const getDateLocale = () => {
-    const loc = getDenseLocale();
-    return `date${loc.charAt(0).toUpperCase() + loc.slice(1)}`;
-  };
+  const getDateLocale = (loc: string = getDenseLocale()) =>
+    `date${loc.charAt(0).toUpperCase() + loc.slice(1)}`;
 
   const availableLocales = () => {
     const { availableLocales } = i18n;
@@ -37,12 +38,16 @@ export const useLanguageStore = defineStore('LanguageStore', () => {
     return availableLocales.map((loc) => dense(loc));
   };
 
-  const getUILocales = async () => {
-    const naiveUI = await import('naive-ui');
-    return {
-      locale: naiveUI[getDenseLocale() as keyof typeof naiveUI],
-      dateLocale: naiveUI[getDateLocale() as keyof typeof naiveUI],
-    };
+  const getUILocales = () => {
+    const { availableLocales } = i18n;
+    const locales: Record<string, Record<string, NLocale | NDateLocale>> = {};
+    availableLocales.map((loc) => {
+      locales[loc] = {
+        locale: naiveUI[dense(loc) as keyof typeof naiveUI] as NLocale,
+        dateLocale: naiveUI[getDateLocale(dense(loc)) as keyof typeof naiveUI] as NDateLocale,
+      };
+    });
+    return locales;
   };
 
   return {
