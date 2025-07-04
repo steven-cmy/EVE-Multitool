@@ -1,3 +1,4 @@
+import router from '@/router';
 import axios, {
   type AxiosResponseHeaders,
   type InternalAxiosRequestConfig,
@@ -85,16 +86,25 @@ axiosInstance.interceptors.request.use(async (config) => {
       retryAfterSeconds: secondsUntilReset,
     });
   }
+
   const cacheKey = getQuery(config);
-  const cached = await cache.get(cacheKey);
+  let cached = null;
+  try {
+    cached = await cache.get(cacheKey);
+  } catch (error) {
+    console.warn('Cache read failed:', error);
+  }
 
   if (cached) {
     config.headers.set('If-None-Match', cached.headers.etag);
-    if (new Date(cached.headers.expires) > new Date()) {
+    const expirationDate = new Date(cached.headers.expires);
+    if (!isNaN(expirationDate.getTime()) && expirationDate > new Date()) {
       // Return cached response
       return Promise.reject({
         __cached: true,
         data: cached.data,
+        headers: cached.headers,
+        config: config,
       });
     }
   }
@@ -108,11 +118,15 @@ axiosInstance.interceptors.response.use(
 
     // Cache responses
     const cacheKey = getQuery(response.config);
-    cache.put({
-      query: cacheKey,
-      data: response.data,
-      headers: response.headers,
-    });
+    try {
+      cache.put({
+        query: cacheKey,
+        data: response.data,
+        headers: response.headers,
+      });
+    } catch (error) {
+      console.warn('Cache write failed:', error);
+    }
     return response;
   },
   async (error) => {
@@ -123,6 +137,8 @@ axiosInstance.interceptors.response.use(
         status: 200,
         statusText: 'OK',
         data: error.data,
+        headers: error.headers || {},
+        config: error.config,
       });
     }
 
@@ -132,14 +148,27 @@ axiosInstance.interceptors.response.use(
 
       updateErrorLimitState(response.headers);
 
-      const cached = await cache.get(cacheKey);
+      let cached = null;
+      try {
+        cached = await cache.get(cacheKey);
+      } catch (e) {
+        console.warn('Cache read failed:', e);
+        Promise.reject({
+          ...error,
+          message: `Cache read failed: ${e}`,
+        });
+      }
       if (cached) {
         // Update expiration if provided in 304 response
         if (response.headers.expires) {
           cached.headers.expires = response.headers.expires;
-          cache.update(cacheKey, (entry) => {
-            entry.headers.expires = new Date(response.headers.expires);
-          });
+          try {
+            cache.update(cacheKey, (entry) => {
+              entry.headers.expires = new Date(response.headers.expires);
+            });
+          } catch (error) {
+            console.warn('Cache update failed:', error);
+          }
         }
         console.log('Cache HIT!(304)');
         // Return cached data with 200 status
@@ -180,4 +209,20 @@ export const getErrorLimitState = () => ({
 export const resetErrorLimit = () => {
   errorLimitRemaining = NaN;
   errorLimitResetTime = NaN;
+};
+
+export const call = async <T>(promise: Promise<{ data: T }>): Promise<T> => {
+  let result: T = {} as T;
+  try {
+    const response = await promise;
+    result = response.data;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
+      router.push({
+        name: 'not-found',
+      });
+    }
+  } finally {
+    return result;
+  }
 };

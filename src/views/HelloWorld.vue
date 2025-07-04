@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { NDatePicker } from 'naive-ui';
-
-const timestamp= ref()
 defineProps<{
   msg: string
 }>()
@@ -16,7 +12,6 @@ defineProps<{
       <a href="https://vite.dev/" target="_blank" rel="noopener">Vite</a> +
       <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>. What's next?
     </h3>
-    <n-date-picker v-model:value="timestamp" type="date" />
   </div>
 </template>
 

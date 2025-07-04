@@ -15,21 +15,10 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue'),
     },
     {
-      path: '/types',
-      component: () => import('../views/esiTypes/esiTypes.vue'),
-      children: [
-        {
-          path: '',
-          component: () => import('../views/esiTypes/TypeList.vue'),
-          name: 'types-list',
-        },
-        {
-          path: ':typeid',
-          component: () => import('../views/esiTypes/TypesView.vue'),
-          name: 'types-showinfo',
-          props: true,
-        },
-      ],
+      path: '/type/:typeid',
+      component: () => import('../views/TypeView.vue'),
+      props: true,
+      name: 'types-showinfo',
     },
     {
       path: '/sso',

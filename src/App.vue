@@ -44,13 +44,13 @@ watch(
     <n-layout position="absolute">
       <n-layout-header bordered>
         <n-grid x-gap="12" cols="12" item-responsive responsive="screen">
-          <n-gi span="0 m:1 l:2">
+          <n-gi span="0 m:1 l:1">
             <EVExcel size="calc(var(--header-height) - 2 * var(--header-padding))" />
           </n-gi>
-          <n-gi span="6 m:6 l:5">
+          <n-gi span="6 m:6 l:6">
             <nav>
               <RouterLink to="/">Home</RouterLink>
-              <RouterLink :to="{ name: 'types-list' }">Types</RouterLink>
+              <RouterLink to="/type/620">Types</RouterLink>
             </nav>
           </n-gi>
           <n-gi span="6 m:5 l:5">
@@ -62,7 +62,7 @@ watch(
           </n-gi>
         </n-grid>
       </n-layout-header>
-      <n-layout id="main" position="absolute">
+      <n-layout id="main" position="absolute" content-style="padding: 5vw;">
         <RouterView />
       </n-layout>
       <n-layout-footer bordered position="absolute">
@@ -75,20 +75,19 @@ watch(
 
 <style>
 :root {
-  --header-height: clamp(50px, 8vw, 100px);
-  --header-padding: 1vw;
-  --footer-height: clamp(50px, 8vw, 100px);
+  --header-height: clamp(50px, 6vw, 100px);
+  --footer-height: clamp(50px, 2vw, 100px);
 }
 </style>
 
 <style scoped>
-.n-layout {
+.n-config-provider {
   font-family: 'Eve Sans Neue', sans-serif;
 }
 
 .n-layout-header {
   height: var(--header-height);
-  padding: var(--header-padding);
+  padding: 1vw;
 }
 
 .n-layout#main {
@@ -99,9 +98,5 @@ watch(
 .n-layout-footer {
   height: var(--footer-height);
   padding: 1vh;
-  font-family:
-    Triglavian,
-    Eve Sans Neue,
-    sans-serif;
 }
 </style>
