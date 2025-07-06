@@ -43,7 +43,7 @@ const loginUrl = computed(() => ({
 </script>
 
 <template>
-  <RouterLink :to="loginUrl"><img :src="ssoButtonUrl" alt="EVE Online SSO Log-in" /></RouterLink>
+  <RouterLink :to="loginUrl" style="display: flex;"><img :src="ssoButtonUrl" alt="EVE Online SSO Log-in" /></RouterLink>
 </template>
 
 <style scoped></style>

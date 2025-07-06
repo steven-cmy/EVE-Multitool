@@ -13,8 +13,6 @@ import {
   NLayoutHeader,
   NLayoutFooter,
   NFlex,
-  NGi,
-  NGrid,
   type NLocale,
   type NDateLocale,
 } from 'naive-ui';
@@ -43,9 +41,24 @@ watch(
   <n-config-provider :theme="theme" :locale="loc" :date-locale="dLoc">
     <n-layout position="absolute">
       <n-layout-header bordered>
-        <n-grid x-gap="12" cols="12" item-responsive responsive="screen">
+        <n-flex justify="space-between" align="center" style="height: 100%" :wrap="false">
+        <n-flex align="center" style="height: 100%" :wrap="false">
+          <RouterLink to="/" style="height: 100%;padding: 0;"><EVExcel /></RouterLink>
+          <nav>
+            <RouterLink to="/">Home</RouterLink>
+            <RouterLink to="/type/620">Types</RouterLink>
+          </nav>
+        </n-flex>
+
+          <n-flex justify="end" align="center" style="height: 100%" :wrap="false">
+            <SSOLogin />
+            <LanguageSwitch />
+            <LightSwitch />
+          </n-flex>
+        </n-flex>
+        <!-- <n-grid x-gap="12" cols="12" item-responsive responsive="screen">
           <n-gi span="0 m:1 l:1">
-            <EVExcel size="calc(var(--header-height) - 2 * var(--header-padding))" />
+            <EVExcel />
           </n-gi>
           <n-gi span="6 m:6 l:6">
             <nav>
@@ -60,13 +73,15 @@ watch(
               <LightSwitch />
             </n-flex>
           </n-gi>
-        </n-grid>
+        </n-grid> -->
       </n-layout-header>
       <n-layout id="main" position="absolute" content-style="padding: 5vw;">
         <RouterView />
       </n-layout>
       <n-layout-footer bordered position="absolute">
-        <RouterLink to="/about">About</RouterLink>
+        <n-flex justify="end" align="center" style="height: 100%" :wrap="false">
+          <RouterLink to="/about">About</RouterLink>
+        </n-flex>
       </n-layout-footer>
     </n-layout>
     <n-global-style />

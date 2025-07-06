@@ -89,7 +89,7 @@ watch(
 );
 </script>
 <template>
-  <n-flex justify="space-between">
+
     <n-skeleton v-if="loading" text style="width: 30%"></n-skeleton>
     <n-breadcrumb v-else separator=">">
       <n-breadcrumb-item>
@@ -103,18 +103,21 @@ watch(
           <span>{{ group.description }}</span>
         </n-popover>
       </n-breadcrumb-item>
-      <n-breadcrumb-item separator="<">{{ type.name }}</n-breadcrumb-item>
-      <n-breadcrumb-item v-if="category" separator="<">
+      <n-breadcrumb-item>{{ type.name }}</n-breadcrumb-item>
+    </n-breadcrumb>
+    <n-breadcrumb separator=">">
+      <n-breadcrumb-item>
+        <RouterLink to="#">{{ $t('types.catagory') }}</RouterLink>
+      </n-breadcrumb-item>
+      <n-breadcrumb-item v-if="category">
         <n-icon v-if="category.published" :component="Eye" /><n-icon v-else :component="EyeOff" />
         {{ category.name }}
       </n-breadcrumb-item>
-      <n-breadcrumb-item v-if="group" separator="<">
+      <n-breadcrumb-item v-if="group">
         <n-icon v-if="group.published" :component="Eye" /><n-icon v-else :component="EyeOff" />
         {{ group.name }}
       </n-breadcrumb-item>
-      <n-breadcrumb-item separator="<">
-        <RouterLink to="#">{{ $t('types.catagory') }}</RouterLink>
-      </n-breadcrumb-item>
+      <n-breadcrumb-item>{{ type.name }}</n-breadcrumb-item>
     </n-breadcrumb>
-  </n-flex>
+
 </template>

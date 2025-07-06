@@ -20,9 +20,18 @@ Object.entries(localeFiles).forEach(async ([key, value]) => {
   messages[lang] = value.default;
 });
 
-const getLocale = () =>
-  localStorage.getItem('locale') ||
-  (short(navigator.language) in messages ? navigator.language : DEFAULT_LOCALE);
+const getLocale = (): string => {
+  const storedLocale = localStorage.getItem('locale');
+  if (storedLocale) return storedLocale;
+  if (navigator.language in messages) return navigator.language;
+
+  // Check if short language code matches any available locale
+  const shortLang = short(navigator.language);
+  const matchingLocale = Object.keys(messages).find(key => short(key) === shortLang);
+  if (matchingLocale) return matchingLocale;
+
+  return DEFAULT_LOCALE;
+}
 
 const i18n = createI18n({
   legacy: false,
