@@ -1,8 +1,7 @@
 import type { NDateLocale, NLocale } from 'naive-ui';
 import { defineStore } from 'pinia';
 import { useI18n } from 'vue-i18n';
-
-const naiveUI = await import('naive-ui');
+import * as naiveUI from 'naive-ui';
 
 export const useLanguageStore = defineStore('LanguageStore', () => {
   const i18n = useI18n();

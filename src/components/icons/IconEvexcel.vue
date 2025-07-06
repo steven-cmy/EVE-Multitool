@@ -1,12 +1,10 @@
 <script setup lang="ts">
-const { height } = withDefaults(
-  defineProps<{
-    height?: string | number;
-  }>(),
-  {
-    height: '100%',
+const { height } = defineProps({
+  height: {
+    type: String,
+    default: '100%',
   },
-);
+});
 </script>
 
 <template>

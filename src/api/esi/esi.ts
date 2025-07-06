@@ -1,4 +1,3 @@
-import router from '@/router';
 import axios, {
   type AxiosResponseHeaders,
   type InternalAxiosRequestConfig,
@@ -209,20 +208,4 @@ export const getErrorLimitState = () => ({
 export const resetErrorLimit = () => {
   errorLimitRemaining = NaN;
   errorLimitResetTime = NaN;
-};
-
-export const call = async <T>(promise: Promise<{ data: T }>): Promise<T> => {
-  let result: T = {} as T;
-  try {
-    const response = await promise;
-    result = response.data;
-  } catch (error) {
-    if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
-      router.push({
-        name: 'not-found',
-      });
-    }
-  } finally {
-    return result;
-  }
 };
