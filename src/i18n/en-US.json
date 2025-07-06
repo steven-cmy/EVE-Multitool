@@ -1,0 +1,8 @@
+{
+    "languageName": "English",
+    "test": "Hello",
+    "types": {
+        "market": "Market",
+        "catagory": "Catagory"
+    }
+}

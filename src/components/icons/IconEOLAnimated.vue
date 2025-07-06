@@ -1,3 +1,12 @@
+<script setup lang="ts">
+const { height } = defineProps({
+  height: {
+    type: String,
+    default: '100%',
+  },
+});
+</script>
+
 <template>
   <svg
     version="1.1"
@@ -9,6 +18,7 @@
     viewBox="0 0 500 500"
     style="enable-background: new 0 0 500 500"
     xml:space="preserve"
+    :height="height"
   >
     <g>
       <defs>

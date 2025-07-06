@@ -1,104 +1,117 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router';
-import HelloWorld from './views/HelloWorld.vue';
-import SSOLogin from './components/SSOLogin.vue';
-import EVExcel from './components/icons/IconEvexcel.vue';
-import EOL from './components/icons/IconEOLAnimated.vue';
-import LanguageSwitch from './components/LanguageSwitch.vue';
-import { computed } from 'vue';
-import { NConfigProvider, darkTheme, lightTheme } from 'naive-ui';
-import LightSwitch from './components/LightSwitch.vue';
+import SSOLogin from '@/components/SSOLogin.vue';
+import EVExcel from '@/components/icons/IconEvexcel.vue';
+import LanguageSwitch from '@/components/LanguageSwitch.vue';
+import { computed, ref, watch } from 'vue';
+import {
+  NConfigProvider,
+  NGlobalStyle,
+  darkTheme,
+  lightTheme,
+  NLayout,
+  NLayoutHeader,
+  NLayoutFooter,
+  NFlex,
+  type NLocale,
+  type NDateLocale,
+} from 'naive-ui';
+import LightSwitch from '@/components/LightSwitch.vue';
 import { useDarkmodeStore } from '@/stores/DarkmodeStore';
+import { useLanguageStore } from '@/stores/LanguageStore';
 
+const langStore = useLanguageStore();
 const darkmodeStore = useDarkmodeStore();
 const theme = computed(() => (darkmodeStore.isDarkmode() ? darkTheme : lightTheme));
+const loc = ref<NLocale | null>(null);
+const dLoc = ref<NDateLocale | null>(null);
+
+watch(
+  () => langStore.getLocale(),
+  (newLocale) => {
+    const { locale, dateLocale } = langStore.getUILocales()[newLocale];
+    loc.value = locale as NLocale;
+    dLoc.value = dateLocale as NDateLocale;
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
-  <n-config-provider :theme="theme">
-    <header>
-      <EVExcel />
-      <EOL />
+  <n-config-provider :theme="theme" :locale="loc" :date-locale="dLoc">
+    <n-layout position="absolute">
+      <n-layout-header bordered>
+        <n-flex justify="space-between" align="center" style="height: 100%" :wrap="false">
+        <n-flex align="center" style="height: 100%" :wrap="false">
+          <RouterLink to="/" style="height: 100%;padding: 0;"><EVExcel /></RouterLink>
+          <nav>
+            <RouterLink to="/">Home</RouterLink>
+            <RouterLink to="/type/620">Types</RouterLink>
+          </nav>
+        </n-flex>
 
-      <div class="wrapper">
-        <HelloWorld msg="You did it!" />
-
-        <nav>
-          <RouterLink to="/">Home</RouterLink>
+          <n-flex justify="end" align="center" style="height: 100%" :wrap="false">
+            <SSOLogin />
+            <LanguageSwitch />
+            <LightSwitch />
+          </n-flex>
+        </n-flex>
+        <!-- <n-grid x-gap="12" cols="12" item-responsive responsive="screen">
+          <n-gi span="0 m:1 l:1">
+            <EVExcel />
+          </n-gi>
+          <n-gi span="6 m:6 l:6">
+            <nav>
+              <RouterLink to="/">Home</RouterLink>
+              <RouterLink to="/type/620">Types</RouterLink>
+            </nav>
+          </n-gi>
+          <n-gi span="6 m:5 l:5">
+            <n-flex justify="end" align="center">
+              <SSOLogin />
+              <LanguageSwitch />
+              <LightSwitch />
+            </n-flex>
+          </n-gi>
+        </n-grid> -->
+      </n-layout-header>
+      <n-layout id="main" position="absolute" content-style="padding: 5vw;">
+        <RouterView />
+      </n-layout>
+      <n-layout-footer bordered position="absolute">
+        <n-flex justify="end" align="center" style="height: 100%" :wrap="false">
           <RouterLink to="/about">About</RouterLink>
-          <RouterLink :to="{ name: 'types-list' }">Types</RouterLink>
-        </nav>
-
-        <SSOLogin />
-        <LanguageSwitch />
-        <LightSwitch />
-      </div>
-    </header>
-
-    <RouterView />
+        </n-flex>
+      </n-layout-footer>
+    </n-layout>
+    <n-global-style />
   </n-config-provider>
 </template>
 
+<style>
+:root {
+  --header-height: clamp(50px, 6vw, 100px);
+  --footer-height: clamp(50px, 2vw, 100px);
+}
+</style>
+
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+.n-config-provider {
+  font-family: 'Eve Sans Neue', sans-serif;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.n-layout-header {
+  height: var(--header-height);
+  padding: 1vw;
 }
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+.n-layout#main {
+  top: var(--header-height);
+  bottom: var(--footer-height);
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+.n-layout-footer {
+  height: var(--footer-height);
+  padding: 1vh;
 }
 </style>

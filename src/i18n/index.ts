@@ -1,5 +1,7 @@
 import { createI18n, type LocaleMessages, type VueMessageType } from 'vue-i18n';
 
+const DEFAULT_LOCALE = 'en-US';
+
 // Dynamically import all JSON files from locales directory
 const messages: Record<string, LocaleMessages<VueMessageType>> = {};
 
@@ -8,28 +10,35 @@ const localeFiles: Record<string, { default: LocaleMessages<VueMessageType> }> =
   './*.json',
   { eager: true },
 );
+const short = (locale: string) => locale.split('-')[0];
 
 // Process the imported files
-Object.entries(localeFiles).forEach(([key, value]) => {
+Object.entries(localeFiles).forEach(async ([key, value]) => {
   // Extract language code from file path
   // '../locales/en.json' -> 'en'
   const lang = key.replace('./', '').replace('.json', '');
   messages[lang] = value.default;
 });
 
-export const getLocale = () => {
-  const browserLocale = navigator.language.split('-')[0];
-  return (
-    localStorage.getItem('locale') || (browserLocale in messages ? browserLocale : null) || 'en'
-  );
-};
+const getLocale = (): string => {
+  const storedLocale = localStorage.getItem('locale');
+  if (storedLocale) return storedLocale;
+  if (navigator.language in messages) return navigator.language;
+
+  // Check if short language code matches any available locale
+  const shortLang = short(navigator.language);
+  const matchingLocale = Object.keys(messages).find(key => short(key) === shortLang);
+  if (matchingLocale) return matchingLocale;
+
+  return DEFAULT_LOCALE;
+}
 
 const i18n = createI18n({
-  legacy: false, // Use Composition API mode
-  locale: getLocale(), // Default locale from browser
-  fallbackLocale: 'en', // Fallback locale
+  legacy: false,
+  locale: getLocale(),
+  fallbackLocale: DEFAULT_LOCALE,
   messages,
-  globalInjection: true, // Enable global $t
+  globalInjection: true,
 });
 
 export default i18n;
