@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, toRefs } from 'vue';
+import { ref, watch } from 'vue';
 import { NSkeleton, NBreadcrumb, NBreadcrumbItem, NIcon } from 'naive-ui';
 import {
   Configuration,
@@ -23,24 +23,33 @@ const loading = ref(true);
 const props = defineProps({
   type: {
     type: Object as () => GetUniverseTypesTypeIdOk,
-    default: {} as GetUniverseTypesTypeIdOk,
+    default: ref<GetUniverseTypesTypeIdOk>(),
+  },
+  group_id: {
+    type: String,
+    default: null,
+  },
+  category_id: {
+    type: String,
+    default: null,
   },
 });
-const { type } = toRefs(props);
 const group = ref<GetUniverseGroupsGroupIdOk>();
 const category = ref<GetUniverseCategoriesCategoryIdOk>();
 const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
 
 watch(
-  [type.value, () => langStore.getShortLocale()],
+  [props.type, () => langStore.getShortLocale()],
   async ([newType, newLocale]) => {
     loading.value = true;
+    group.value = {} as GetUniverseGroupsGroupIdOk;
+    category.value = {} as GetUniverseCategoriesCategoryIdOk;
     const datasource = 'tranquility';
-
-    if (newType.group_id) {
+    const targetGroupId = props.group_id ? parseInt(props.group_id) : newType?.group_id;
+    if (targetGroupId) {
       group.value = await api
         .getUniverseGroupsGroupId(
-          newType.group_id,
+          targetGroupId,
           newLocale as GetUniverseGroupsGroupIdAcceptLanguageEnum,
           datasource as GetUniverseGroupsGroupIdDatasourceEnum,
           undefined,
@@ -51,10 +60,13 @@ watch(
         })
         .then((response) => response?.data);
     }
-    if (group.value?.category_id) {
+    const targetCategoryId = props.category_id
+      ? parseInt(props.category_id)
+      : group.value?.category_id;
+    if (targetCategoryId) {
       category.value = await api
         .getUniverseCategoriesCategoryId(
-          group.value.category_id,
+          targetCategoryId,
           newLocale as GetUniverseCategoriesCategoryIdAcceptLanguageEnum,
           datasource as GetUniverseCategoriesCategoryIdDatasourceEnum,
           undefined,
@@ -76,14 +88,18 @@ watch(
     <n-breadcrumb-item>
       <RouterLink to="#">{{ $t('types.catagory') }}</RouterLink>
     </n-breadcrumb-item>
-    <n-breadcrumb-item v-if="category">
-      <n-icon v-if="category.published" :component="Eye" /><n-icon v-else :component="EyeOff" />
-      {{ category.name }}
+    <n-breadcrumb-item v-if="category && Object.keys(category).length > 0">
+      <RouterLink :to="{ name: 'category', params: { categoryid: category.category_id } }">
+        <n-icon v-if="category.published" :component="Eye" /><n-icon v-else :component="EyeOff" />
+        {{ category.name }}
+      </RouterLink>
     </n-breadcrumb-item>
-    <n-breadcrumb-item v-if="group">
-      <n-icon v-if="group.published" :component="Eye" /><n-icon v-else :component="EyeOff" />
-      {{ group.name }}
+    <n-breadcrumb-item v-if="group && Object.keys(group).length > 0">
+      <RouterLink :to="{ name: 'group', params: { groupid: group.group_id } }">
+        <n-icon v-if="group.published" :component="Eye" /><n-icon v-else :component="EyeOff" />
+        {{ group.name }}
+      </RouterLink>
     </n-breadcrumb-item>
-    <n-breadcrumb-item>{{ type.name }}</n-breadcrumb-item>
+    <n-breadcrumb-item v-if="props.type.name">{{ type.name }}</n-breadcrumb-item>
   </n-breadcrumb>
 </template>

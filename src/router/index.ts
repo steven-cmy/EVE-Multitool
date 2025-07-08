@@ -15,6 +15,18 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue'),
     },
     {
+      path: '/category/:categoryid',
+      component: () => import('../views/CategoryView.vue'),
+      props: true,
+      name: 'category',
+    },
+    {
+      path: '/group/:groupid',
+      component: () => import('../views/GroupView.vue'),
+      props: true,
+      name: 'group',
+    },
+    {
       path: '/type/:typeid',
       component: () => import('../views/TypeView.vue'),
       props: true,

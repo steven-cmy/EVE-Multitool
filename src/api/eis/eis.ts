@@ -31,6 +31,7 @@ export const getImageUrl = (image: IMAGE): string => {
   const { category, id, size, variation, tenant = DEFAULT_TENANT } = image;
 
   const variant = (() => {
+    if (variation) return variation;
     switch (category) {
       case 'alliances':
         return 'logo';
