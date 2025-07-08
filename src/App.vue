@@ -42,13 +42,13 @@ watch(
     <n-layout position="absolute">
       <n-layout-header bordered>
         <n-flex justify="space-between" align="center" style="height: 100%" :wrap="false">
-        <n-flex align="center" style="height: 100%" :wrap="false">
-          <RouterLink to="/" style="height: 100%;padding: 0;"><EVExcel /></RouterLink>
-          <nav>
-            <RouterLink to="/">Home</RouterLink>
-            <RouterLink to="/type/620">Types</RouterLink>
-          </nav>
-        </n-flex>
+          <n-flex align="center" style="height: 100%" :wrap="false">
+            <RouterLink to="/" style="height: 100%; padding: 0"><EVExcel /></RouterLink>
+            <nav>
+              <RouterLink :to="{ name: 'home' }">{{ $t('test') }}</RouterLink>
+              <RouterLink :to="{ name: 'categories' }">{{ $t('types.category') }}</RouterLink>
+            </nav>
+          </n-flex>
 
           <n-flex justify="end" align="center" style="height: 100%" :wrap="false">
             <SSOLogin />
@@ -56,24 +56,6 @@ watch(
             <LightSwitch />
           </n-flex>
         </n-flex>
-        <!-- <n-grid x-gap="12" cols="12" item-responsive responsive="screen">
-          <n-gi span="0 m:1 l:1">
-            <EVExcel />
-          </n-gi>
-          <n-gi span="6 m:6 l:6">
-            <nav>
-              <RouterLink to="/">Home</RouterLink>
-              <RouterLink to="/type/620">Types</RouterLink>
-            </nav>
-          </n-gi>
-          <n-gi span="6 m:5 l:5">
-            <n-flex justify="end" align="center">
-              <SSOLogin />
-              <LanguageSwitch />
-              <LightSwitch />
-            </n-flex>
-          </n-gi>
-        </n-grid> -->
       </n-layout-header>
       <n-layout id="main" position="absolute" content-style="padding: 5vw;">
         <RouterView />

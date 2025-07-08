@@ -3,6 +3,6 @@
     "test": "Hello",
     "types": {
         "market": "Market",
-        "catagory": "Catagory"
+        "category": "Category"
     }
 }

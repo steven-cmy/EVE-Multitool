@@ -15,10 +15,18 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue'),
     },
     {
-      path: '/category/:categoryid',
+      path: '/category',
       component: () => import('../views/CategoryView.vue'),
       props: true,
-      name: 'category',
+      name: 'categories',
+      children: [
+        {
+          path: ':categoryid',
+          component: () => import('../views/CategoryView.vue'),
+          props: true,
+          name: 'category',
+        },
+      ],
     },
     {
       path: '/group/:groupid',
