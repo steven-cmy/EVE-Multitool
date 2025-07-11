@@ -5,6 +5,7 @@ import EVExcel from '@/components/icons/IconEvexcel.vue';
 import LanguageSwitch from '@/components/LanguageSwitch.vue';
 import { computed, ref, watch } from 'vue';
 import {
+  NBackTop,
   NConfigProvider,
   NGlobalStyle,
   darkTheme,
@@ -59,6 +60,7 @@ watch(
       </n-layout-header>
       <n-layout id="main" position="absolute" content-style="padding: 5vw;">
         <RouterView />
+        <n-back-top />
       </n-layout>
       <n-layout-footer bordered position="absolute">
         <n-flex justify="end" align="center" style="height: 100%" :wrap="false">

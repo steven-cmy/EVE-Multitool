@@ -3,6 +3,9 @@
     "test": "Hello",
     "types": {
         "market": "Market",
-        "category": "Category"
+        "category": "Category",
+        "attributes":{
+            "description": "Description"
+        }
     }
 }

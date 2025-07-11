@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue';
-import EVEMarkup from '@/components/EVEMarkup.vue';
-import MarketGroups from '@/components/Type/MarketGroups.vue';
+// import EVEMarkup from '@/components/EVEMarkup.vue';
+// import MarketGroups from '@/components/Type/MarketGroups.vue';
 import CategoryGroup from '@/components/Type/CategoryGroup.vue';
 import TypeImage from '@/components/Type/TypeImage.vue';
 import { axiosInstance } from '@/api/esi';
@@ -13,9 +13,10 @@ import {
   GetUniverseTypesTypeIdLanguageEnum,
   type GetUniverseTypesTypeIdOk,
 } from 'eve-esi-client-ts';
-import { NSkeleton, NThing, NH1, NText } from 'naive-ui';
+import { NCard, NSkeleton, NThing, NH1 } from 'naive-ui';
 import { useLanguageStore } from '@/stores/LanguageStore';
 import { useRouter } from 'vue-router';
+import TypeAttributes from '@/components/Type/TypeAttributes.vue';
 
 const router = useRouter();
 const { typeid } = defineProps({
@@ -58,9 +59,10 @@ watch(
 
 <template>
   <CategoryGroup :type="type" />
-  <MarketGroups :type="type" />
+  <!-- <MarketGroups :type="type" /> -->
   <main>
-    <n-thing>
+    <n-card embedded style="margin-top: 2vh;">
+      <n-thing>
       <template #avatar>
         <n-skeleton v-if="loading" height="64px" width="64px" />
         <TypeImage v-else :typeid="type.type_id" />
@@ -74,12 +76,14 @@ watch(
       <template #header-extra>
         {{ type.type_id }}
       </template>
-      <template #description>
+      <!-- <template #description>
         <n-text>
           <EVEMarkup :html="type.description" />
         </n-text>
-      </template>
-      <!-- Thing here -->
+      </template> -->
+      <TypeAttributes :type="type" />
     </n-thing>
+    </n-card>
+
   </main>
 </template>
