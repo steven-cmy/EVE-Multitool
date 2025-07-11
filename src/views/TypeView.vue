@@ -13,7 +13,7 @@ import {
   GetUniverseTypesTypeIdLanguageEnum,
   type GetUniverseTypesTypeIdOk,
 } from 'eve-esi-client-ts';
-import { NSkeleton } from 'naive-ui';
+import { NSkeleton, NThing, NH1, NText } from 'naive-ui';
 import { useLanguageStore } from '@/stores/LanguageStore';
 import { useRouter } from 'vue-router';
 
@@ -60,17 +60,26 @@ watch(
   <CategoryGroup :type="type" />
   <MarketGroups :type="type" />
   <main>
-    <n-skeleton v-if="loading" height="64px" width="64px" />
-    <TypeImage v-else :typeid="type.type_id" />
-    <h1>
-      <n-skeleton v-if="loading" text style="width: 20%" />
-      <span v-else>
-        {{ type.name }}<sub>{{ type.type_id }}</sub>
-      </span>
-    </h1>
-    <p v-if="loading"><n-skeleton text :repeat="3" /> <n-skeleton text style="width: 60%" /></p>
-    <p v-else>
-      <EVEMarkup :html="type.description" />
-    </p>
+    <n-thing>
+      <template #avatar>
+        <n-skeleton v-if="loading" height="64px" width="64px" />
+        <TypeImage v-else :typeid="type.type_id" />
+      </template>
+      <template #header>
+        <n-skeleton v-if="loading" text style="width: 20%" />
+        <n-h1 v-else>
+          {{ type.name }}
+        </n-h1>
+      </template>
+      <template #header-extra>
+        {{ type.type_id }}
+      </template>
+      <template #description>
+        <n-text>
+          <EVEMarkup :html="type.description" />
+        </n-text>
+      </template>
+      <!-- Thing here -->
+    </n-thing>
   </main>
 </template>

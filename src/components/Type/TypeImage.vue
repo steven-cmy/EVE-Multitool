@@ -9,18 +9,14 @@ const { typeid } = defineProps({
   },
   alt: String,
 });
-const render = getImageUrl({ id: typeid, variation: 'render', category: 'types' });
+// const render = getImageUrl({ id: typeid, variation: 'render', category: 'types' });
 const icon = getImageUrl({ id: typeid, variation: 'icon', category: 'types' });
 </script>
 <template>
   <n-image
     :src="icon"
-    :fallback-src="icon"
-    :preview-src="render"
-    lazy
-    :show-toolbar="false"
-    :alt="alt ?? `Image for type ${{ typeid }}`"
-  >
-    <template #error> X </template>
-  </n-image>
+    fallback-src="/images/0_64.png"
+    preview-disabled
+    :alt="alt ?? `Image for type ${typeid}`"
+  />
 </template>

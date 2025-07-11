@@ -87,32 +87,31 @@ watch(
 </script>
 <template>
   <n-list-item v-if="data">
-    <RouterLink
-      :to="{
-      name: type === 'type' ? 'types-showinfo' : type,
-      params: {
-        [`${type}id`]: id
-      }
-      }"
-    >
-      <n-thing>
-        <template #avatar>
-          <TypeImage v-if="'type_id' in data" :typeid="data.type_id" />
-        </template>
-        <template #header>
-          <n-h2 v-if="loading"><n-skeleton text style="width: 30%"></n-skeleton></n-h2>
-          <n-h2 v-else>{{ data.name }}</n-h2>
-        </template>
-        <template v-if="'type_id' in data" #description>
-          <n-ellipsis style="max-width: 70vw" :tooltip="false">{{
-            data.description.replace(/<[^>]+>/g, '')
-          }}</n-ellipsis>
-        </template>
-        <template v-if="'category_id' in data" #header-extra>
-          <span v-if="'types' in data">{{ data.types.length }}</span>
-          <span v-if="'groups' in data">{{ data.groups.length }}</span>
-        </template>
-      </n-thing>
-    </RouterLink>
+    <n-thing content-indented>
+      <template #avatar>
+        <TypeImage v-if="'type_id' in data" :typeid="data.type_id" />
+      </template>
+      <template #header>
+        <n-h2 v-if="loading"><n-skeleton text style="width: 30%"></n-skeleton></n-h2>
+        <n-h2 v-else>
+          <RouterLink
+            :to="{ name: type === 'type' ? 'types-showinfo' : type, params: { [`${type}id`]: id } }"
+          >
+            {{ data.name }}
+          </RouterLink>
+        </n-h2>
+      </template>
+      <template v-if="'category_id' in data" #header-extra>
+        <span v-if="'types' in data">{{ data.types.length }}</span>
+        <span v-if="'groups' in data">{{ data.groups.length }}</span>
+      </template>
+      <template v-if="'description' in data" #description>
+        <n-ellipsis style="max-width: 70vw" :tooltip="false">{{
+          data.description.replace(/<[^>]+>/g, '')
+        }}</n-ellipsis>
+      </template>
+      <!-- <template #footer> Footer </template>
+        <template #action> </template> -->
+    </n-thing>
   </n-list-item>
 </template>

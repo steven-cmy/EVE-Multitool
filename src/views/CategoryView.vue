@@ -14,7 +14,7 @@ import {
 import { ref, watch } from 'vue';
 import { NSkeleton, NPagination, NList, NH1 } from 'naive-ui';
 import { useRoute } from 'vue-router';
-import GroupTypeList from '@/components/Type/GroupTypeList.vue';
+import TypeListItems from '@/components/Type/TypeListItems.vue';
 
 const langStore = useLanguageStore();
 const loading = ref(true);
@@ -69,7 +69,7 @@ watch(
 <template>
   <CategoryGroup :category_id="categoryid" />
   <main v-if="loading">
-    <n-list hoverable clickable>
+    <n-list hoverable>
       <template #header>
         <n-h1><n-skeleton text style="width: 10%"></n-skeleton></n-h1>
       </template>
@@ -85,11 +85,11 @@ watch(
           :page-size="page_size"
         />
       </template>
-      <GroupTypeList />
+      <TypeListItems />
     </n-list>
   </main>
   <main v-else>
-    <n-list hoverable clickable>
+    <n-list hoverable>
       <template #header>
         <n-h1>{{ category?.name ? category.name : $t('types.category') }}</n-h1>
       </template>
@@ -105,7 +105,7 @@ watch(
           :page-size="page_size"
         />
       </template>
-      <GroupTypeList
+      <TypeListItems
         v-for="id in (category?.groups ? category.groups : categories)?.slice(
           (page - 1) * page_size,
           page * page_size,

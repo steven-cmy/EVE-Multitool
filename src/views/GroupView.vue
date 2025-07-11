@@ -13,7 +13,7 @@ import {
 import { ref, watch } from 'vue';
 import { NPagination, NList, NH1 } from 'naive-ui';
 import { useRoute } from 'vue-router';
-import GroupTypeList from '@/components/Type/GroupTypeList.vue';
+import TypeListItems from '@/components/Type/TypeListItems.vue';
 
 const langStore = useLanguageStore();
 const loading = ref(true);
@@ -57,7 +57,7 @@ watch(
 <template>
   <CategoryGroup :group_id="groupid" />
   <main v-if="group?.types && group.types.length > 0">
-    <n-list hoverable clickable>
+    <n-list hoverable>
       <template #header>
         <n-h1>{{ group.name }}</n-h1>
       </template>
@@ -73,7 +73,7 @@ watch(
           :page-size="page_size"
         />
       </template>
-      <GroupTypeList
+      <TypeListItems
         v-for="tid in group.types.slice((page - 1) * page_size, page * page_size)"
         :key="tid"
         :id="tid"
