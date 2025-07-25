@@ -18,11 +18,11 @@ const { type } = toRefs(props);
   <n-tabs type="card" animated>
     <n-tab-pane name="description" :tab="i18n.t('types.attributes.description')">
       <EVEMarkup :html="type.description" />
-      <p v-for="effect in type.dogma_effects" :key="effect.effect_id">{{ effect.effect_id }}</p>
     </n-tab-pane>
-    <n-tab-pane name="the beatles" tab="the Beatles"> Hey Jude </n-tab-pane>
     <n-tab-pane name="raw" tab="RAW">
       {{ type }}
+      <hr>
+
     </n-tab-pane>
   </n-tabs>
 </template>
