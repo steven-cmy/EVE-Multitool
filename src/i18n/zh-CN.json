@@ -4,8 +4,12 @@
     "types": {
         "market": "市场",
         "category": "分类",
-        "attributes":{
+        "attributes": {
             "description": "描述"
         }
+    },
+    "epoch": {
+        "title": "时间",
+        "local": "本地时间"
     }
 }

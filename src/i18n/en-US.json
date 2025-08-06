@@ -4,8 +4,12 @@
     "types": {
         "market": "Market",
         "category": "Category",
-        "attributes":{
+        "attributes": {
             "description": "Description"
         }
+    },
+    "epoch": {
+        "title": "Time",
+        "local": "Local"
     }
 }
