@@ -10,6 +10,7 @@
     },
     "epoch": {
         "title": "Time",
-        "local": "Local"
+        "UTC": "EVE Time/UTC",
+        "local": "Local Time"
     }
 }

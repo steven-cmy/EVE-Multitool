@@ -1,62 +1,78 @@
 <template>
-  <n-flex justify="center">
-    <n-card title="EVE/UTC" hoverable>
-      <n-time time-zone="UTC" :time="now" unix />
-    </n-card>
-    <n-card :title="$t('epoch.local')" hoverable>
-      <n-time :time="now" unix />
-    </n-card>
-    <n-card v-for="{ tzname, tzcode } in timezones" :key="tzcode" :title="$t(tzname)" hoverable>
-      <n-time :time-zone="tzcode" :time="now" unix />
-    </n-card>
-  </n-flex>
-  <br />
-  <n-time :time="now" unix />
-  <br />
-  <n-time
-    :time="now"
-    :to="Math.floor(Date.now() / 1000)"
-    type="relative"
-    unix
-    v-if="!Number.isNaN(ts)"
-  />
+  <!-- <n-h1>
+    <n-flex justify="space-between">
+      <n-time
+        v-if="!Number.isNaN(ts)"
+        :time="ts"
+        :to="Math.floor(Date.now() / 1000)"
+        type="relative"
+        unix
+      />
+      <span v-else />
+      <n-flex>
+        <n-switch :default-value="!Number.isNaN(ts)" @update:value="toggleLock">
+          <template #checked-icon>
+            <n-icon :component="Lock" />
+          </template>
+          <template #unchecked-icon>
+            <n-icon :component="LockOpen" />
+          </template>
+        </n-switch>
+      </n-flex>
+    </n-flex>
+  </n-h1>
+  <n-grid x-gap="12" y-gap="8" :cols="5">
+    <n-grid-item
+      ><TimeCard :timestamp="timestamp" timezone="UTC" :name="$t('epoch.UTC')"
+    /></n-grid-item>
+    <n-grid-item><TimeCard :timestamp="timestamp" :name="$t('epoch.local')" /></n-grid-item>
+    <n-grid-item v-for="tz in timezones" :key="tz">
+      <TimeCard :timezone="tz" :timestamp="timestamp" />
+    </n-grid-item>
+  </n-grid> -->
+  <TimeCard :timestamp="ts"/>
 </template>
 <script setup lang="ts">
-import { NCard, NFlex, NTime } from 'naive-ui';
-import { ref, onMounted, onUnmounted } from 'vue';
+import { NFlex, NGrid, NGridItem, NH1, NIcon, NSwitch, NTime } from 'naive-ui';
+import { Lock, LockOpen } from '@vicons/tabler';
+import TimeCard from '@/components/Epoch/Timecard.vue';
+import { computed, ref, toRefs, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const timezones = [
-  { tzname: 'epoch.USW', tzcode: 'US/Pacific' },
-  { tzname: 'epoch.USC', tzcode: 'US/Central' },
-  { tzname: 'epoch.USE', tzcode: 'US/Eastern' },
-  { tzname: 'epoch.IS', tzcode: 'Atlantic/Reykjavik' },
-  { tzname: 'epoch.RUW', tzcode: 'Europe/Moscow' },
-  { tzname: 'epoch.CN', tzcode: 'Asia/Shanghai' },
+  'US/Pacific',
+  'US/Central',
+  'US/Eastern',
+  'Atlantic/Reykjavik',
+  'Australia/Sydney',
+  'Europe/Moscow',
+  'Asia/Shanghai',
 ];
 
 const { timestamp } = defineProps({
-  timestamp: String,
+  timestamp: {
+    type: String,
+    required: false,
+  },
 });
-const ts = timestamp ? parseInt(timestamp) : NaN;
-const now = ref();
-if (Number.isNaN(ts)) {
-  let timer: number;
 
-  onMounted(() => {
-    timer = setInterval(() => {
-      now.value = Math.floor(Date.now() / 1000);
-    }, 1000);
-  });
+const ts=ref()
 
-  onUnmounted(() => {
-    clearInterval(timer);
-  });
-} else {
-  now.value = ts;
+watch(
+  () => timestamp,
+  (newTs) => {
+    console.log('new', newTs);
+    ts.value = newTs?.toString();
+  },
+  {
+    immediate: true,
+  },
+);
+
+function toggleLock() {
+  if (Number.isNaN(ts.value)) {
+    console.log('@', ts.value);
+    router.push({ name: 'epoch', params: { timestamp: Math.floor(Date.now() / 1000).toString() } });
+  }
 }
 </script>
-<style lang="css" scoped>
-.n-card {
-  width: fit-content;
-}
-</style>
