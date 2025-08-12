@@ -10,7 +10,18 @@
     },
     "epoch": {
         "title": "时间",
+        "live": "现在时间",
+        "copyDiscord": "复制Discord时间戳",
         "UTC": "EVE时间/UTC",
-        "local": "本地时间"
+        "local": "本地时间",
+        "calc": {
+            "year": "年",
+            "month": "月",
+            "week": "周",
+            "day": "日",
+            "hour": "小时",
+            "minute": "分钟",
+            "second": "秒"
+        }
     }
 }

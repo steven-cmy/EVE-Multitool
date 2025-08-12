@@ -1,23 +1,23 @@
 <template>
-  <n-card :title="name || getTimezoneDisplayName(timezone)" hoverable>
+  <n-card :title="`${name || longName}`.concat(shortName ? ` (${shortName})` : '')" hoverable>
     <n-h2>
-      <n-time :time-zone="timezone" :time="now" format="HH:mm:ss" unix />
-      {{ getTimezoneDisplayName(timezone, 'short') }}
+      <n-time :time-zone="timezone" :time="now" format="HH:mm:ss" />
     </n-h2>
     <br />
-    <n-h3><n-time :time-zone="timezone" :time="now" format="yyyy-MM-dd" unix /></n-h3>
-    <p>{{ timestamp }}</p>
+    <n-h3><n-time :time-zone="timezone" :time="now" format="PPPP BBBBB" /></n-h3>
+    <!-- <br />
+    {{ now }} -->
   </n-card>
 </template>
 <script setup lang="ts">
 import { NCard, NH2, NH3, NTime } from 'naive-ui';
-import { ref, onMounted, onUnmounted, toRefs } from 'vue';
+import { computed, ref, toRefs, watch } from 'vue';
 import { useLanguageStore } from '@/stores/LanguageStore';
 
 const props = defineProps({
   timestamp: {
     type: String,
-    required: false,
+    required: true,
   },
   timezone: {
     type: String,
@@ -31,26 +31,20 @@ const props = defineProps({
 const { timestamp, timezone, name } = toRefs(props);
 const langStore = useLanguageStore();
 const now = ref<number>();
+const longName = computed(() => getTimezoneDisplayName());
+const shortName = computed(() => getTimezoneDisplayName('short'));
 
-if (!timestamp?.value) {
-  let timer: number;
-
-  onMounted(() => {
-    timer = setInterval(() => {
-      now.value = Math.floor(Date.now() / 1000);
-    }, 1000);
-  });
-
-  onUnmounted(() => {
-    clearInterval(timer);
-  });
-} else {
-  now.value = parseInt(timestamp.value);
-}
+watch(
+  timestamp,
+  (newTs) => {
+    now.value = parseInt(newTs);
+  },
+  { immediate: true },
+);
 
 function getTimezoneDisplayName(
-  timeZoneCode: string | undefined,
   style: 'long' | 'short' | 'shortOffset' | 'longOffset' | 'shortGeneric' | 'longGeneric' = 'long',
+  timeZoneCode: string | undefined = timezone?.value,
   locale = langStore.getShortLocale(),
 ) {
   try {
@@ -68,8 +62,4 @@ function getTimezoneDisplayName(
   }
 }
 </script>
-<style lang="css" scoped>
-.n-card {
-  height: 100%;
-}
-</style>
+<style lang="css" scoped></style>
