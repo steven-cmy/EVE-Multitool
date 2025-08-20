@@ -3,6 +3,25 @@
     "test": "Hello",
     "types": {
         "market": "Market",
-        "catagory": "Catagory"
+        "category": "Category",
+        "attributes": {
+            "description": "Description"
+        }
+    },
+    "epoch": {
+        "title": "Time",
+        "live": "Go to now",
+        "copyDiscord": "Copy Discord timestamp",
+        "UTC": "EVE Time/UTC",
+        "local": "Local Time",
+        "calc": {
+            "year": "Year(s)",
+            "month": "Month(s)",
+            "week": "Week(s)",
+            "day": "Day(s)",
+            "hour": "Hour(s)",
+            "minute": "Min(s)",
+            "second": "Sec(s)"
+        }
     }
 }

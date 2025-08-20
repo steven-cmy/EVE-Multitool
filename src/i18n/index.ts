@@ -27,11 +27,11 @@ const getLocale = (): string => {
 
   // Check if short language code matches any available locale
   const shortLang = short(navigator.language);
-  const matchingLocale = Object.keys(messages).find(key => short(key) === shortLang);
+  const matchingLocale = Object.keys(messages).find((key) => short(key) === shortLang);
   if (matchingLocale) return matchingLocale;
 
   return DEFAULT_LOCALE;
-}
+};
 
 const i18n = createI18n({
   legacy: false,

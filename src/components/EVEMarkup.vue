@@ -1,127 +1,89 @@
 <template>
-  <template v-for="(part, index) in parsedContent" :key="index">
-    <RouterLink
-      v-if="part.type === 'router-link'"
-      :to="{ name: 'types-showinfo', params: { typeid: part.type_id } }"
-    >
-      {{ part.content }}
-    </RouterLink>
-    <a
-      v-else-if="part.type === 'external-link'"
-      :href="part.href"
-      v-bind="part.attrs"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {{ part.content }}
-    </a>
-    <span v-else-if="part.type === 'html'" v-html="part.content" />
-    <span v-else>{{ part.content }}</span>
-  </template>
+  <div v-html="parsedContent" />
 </template>
+
 <script setup lang="ts">
 import { computed } from 'vue';
-// import { RouterLink } from 'vue-router';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const props = defineProps({
   html: {
     type: String,
-    // required: true,
   },
 });
 
-const processHtmlStyles = (html: string) => {
-  return html
-    .replace(/<b>/g, '<span style="font-weight:bold;">')
-    .replace(/<\/b>/g, '</span>')
-    .replace(/<i>/g, '<span style="font-style:italic;">')
-    .replace(/<\/i>/g, '</span>')
-    .replace(/<font size=\"(\d+)\">/g, (_, size) => `<span style="font-size:${size}px;">`)
-    .replace(/<font color=\"([^\"]+)\">/g, (_, color) => `<span style="color:${color};">`)
-    .replace(
-      /<font size=\"(\d+)\" color=\"([^\"]+)\">/g,
-      (_, size, color) => `<span style="font-size:${size}px; color:${color};">`,
-    )
-    .replace(
-      /<font color=\"([^\"]+)\" size=\"(\d+)\">/g,
-      (_, color, size) => `<span style="font-size:${size}px; color:${color};">`,
-    )
-    .replace(/<\/fontsize>/g, '</span>')
-    .replace(/<\/font>/g, '</span>')
-    .replace(/<color=(\w+)>/g, (_, color) => `<span style="color:${color};">`)
-    .replace(/<\/color>/g, '</span>')
-    .replace(/\n/g, '<br>');
-};
 
-const parsedContent = computed(() => {
-  const parts = [];
-  let currentIndex = 0;
+const parsedContent = computed<string | undefined>(() => {
+  if (!props.html) return undefined;
+  const parser: DOMParser = new DOMParser();
+  const dom: Document = parser.parseFromString(
+    props.html
+      .replace(/\r?\n/gi, '<br>')
+      .replace(/<url=([^>]+)>([^<]*)<\/url>/gi, (_, url, text) => `<a href="${url}">${text}</a>`),
+    'text/html',
+  );
+  const elements = dom.querySelector('body')?.children;
+  if (elements) {
+    const tagMappings: Record<string, string> = {
+      b: 'span',
+      i: 'span',
+      font: 'span',
+      a: 'a',
+    };
 
-  if (!props.html) return [];
+    const processElement = (element: Element) => {
+      // Process children first (depth-first)
+      Array.from(element.children).forEach((child) => {
+        processElement(child);
+      });
 
-  // First, process the HTML styles
-  const processedHtml = processHtmlStyles(props.html);
-
-  // Regex to find <a> tags
-  const linkRegex = /<(?:a|url)\s*([^>]*?)(?:href)?="?([^>"]*)"?([^>]*?)>(.*?)<\/(?:a|url)>/gi;
-  let match;
-
-  while ((match = linkRegex.exec(processedHtml)) !== null) {
-    // Add text/HTML before the link
-    if (match.index > currentIndex) {
-      const beforeText = processedHtml.slice(currentIndex, match.index);
-      if (beforeText.trim()) {
-        parts.push({
-          type: 'html',
-          content: beforeText,
+      // Then process current element
+      const oldTag = element.tagName.toLowerCase();
+      if (tagMappings[oldTag]) {
+        const newElement = dom.createElement(tagMappings[oldTag]);
+        // Copy all attributes
+        Array.from(element.attributes).forEach((attr) => {
+          if (attr.name === 'href') {
+            if (attr.value.startsWith('showinfo')) {
+              newElement.setAttribute(
+                attr.name,
+                router.resolve(
+                  { name: 'types-showinfo', params: { typeid: attr.value.split(':')[1] } },
+                  router.currentRoute.value,
+                ).fullPath,
+              );
+            } else {
+              newElement.setAttribute(attr.name, attr.value);
+              newElement.setAttribute('target', '_blank');
+              newElement.setAttribute('rel', 'noopener noreferrer');
+            }
+          } else if (attr.name === 'size') {
+            newElement.style.setProperty('font-size', `${attr.value}px`);
+          } else if (attr.name === 'color') {
+            newElement.style.setProperty('color', attr.value);
+          } else {
+            newElement.setAttribute(attr.name, attr.value);
+          }
         });
+
+        if (oldTag === 'b') {
+          newElement.style.setProperty('font-weight', 'bold');
+        }
+        if (oldTag === 'i') {
+          newElement.style.setProperty('font-style', 'italic');
+        }
+        // Copy inner content
+        newElement.innerHTML = element.innerHTML;
+        element.replaceWith(newElement);
       }
-    }
+    };
 
-    const [, beforeHref, href, afterHref, linkText] = match;
-    const allAttrs = (beforeHref + afterHref).trim();
-
-    // Parse attributes
-    const attrs: Record<string, string> = {};
-    const attrRegex = /(\w+)="([^"]*)"/g;
-    let attrMatch;
-    while ((attrMatch = attrRegex.exec(allAttrs)) !== null) {
-      if (attrMatch[1] !== 'href') {
-        attrs[attrMatch[1]] = attrMatch[2];
-      }
-    }
-
-    // Determine if it's an internal or external link
-    if (href.startsWith('showinfo') && href.split(':')[1]) {
-      parts.push({
-        type: 'router-link',
-        type_id: href.split(':')[1],
-        content: linkText,
-        attrs,
-      });
-    } else {
-      parts.push({
-        type: 'external-link',
-        href,
-        content: linkText,
-        attrs,
-      });
-    }
-
-    currentIndex = linkRegex.lastIndex;
+    // Process all top-level elements
+    Array.from(elements).forEach((element) => {
+      processElement(element);
+    });
   }
-
-  // Add remaining text/HTML
-  if (currentIndex < processedHtml.length) {
-    const remainingText = processedHtml.slice(currentIndex);
-    if (remainingText.trim()) {
-      parts.push({
-        type: 'html',
-        content: remainingText,
-      });
-    }
-  }
-
-  return parts;
+  return dom.querySelector('body')?.innerHTML;
 });
 </script>

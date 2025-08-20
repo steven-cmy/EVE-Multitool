@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, toRefs } from 'vue';
+import { ref, toRefs, watch } from 'vue';
 import { NSkeleton, NBreadcrumb, NBreadcrumbItem, NIcon } from 'naive-ui';
 import {
   Configuration,
@@ -21,44 +21,62 @@ import { Eye, EyeOff } from '@vicons/tabler';
 const langStore = useLanguageStore();
 const loading = ref(true);
 const props = defineProps({
-  type: {
-    type: Object as () => GetUniverseTypesTypeIdOk,
-    default: {} as GetUniverseTypesTypeIdOk,
-  },
+  type: Object as () => GetUniverseTypesTypeIdOk,
+  group_id: String,
+  category_id: String,
 });
-const { type } = toRefs(props);
+const { type, group_id, category_id } = toRefs(props);
 const group = ref<GetUniverseGroupsGroupIdOk>();
 const category = ref<GetUniverseCategoriesCategoryIdOk>();
 const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
 
 watch(
-  [type.value, () => langStore.getShortLocale()],
-  async ([newType, newLocale]) => {
+  [() => type?.value?.group_id, group_id, category_id, () => langStore.getShortLocale()],
+  async ([newTypeGroupId, newGroupId, newCategoryId, newLocale]) => {
     loading.value = true;
+    group.value = {} as GetUniverseGroupsGroupIdOk;
+    category.value = {} as GetUniverseCategoriesCategoryIdOk;
     const datasource = 'tranquility';
 
-    if (newType.group_id) {
+    // Ensure targetGroupId is a number
+    const rawGroupId = newGroupId ?? newTypeGroupId;
+    const targetGroupId = typeof rawGroupId === 'function' ? rawGroupId() : rawGroupId;
+    if (targetGroupId) {
       group.value = await api
         .getUniverseGroupsGroupId(
-          newType.group_id,
-          newLocale as GetUniverseGroupsGroupIdAcceptLanguageEnum,
+          Number(targetGroupId),
+          newLocale as unknown as GetUniverseGroupsGroupIdAcceptLanguageEnum,
           datasource as GetUniverseGroupsGroupIdDatasourceEnum,
           undefined,
-          newLocale as GetUniverseGroupsGroupIdLanguageEnum,
+          newLocale as unknown as GetUniverseGroupsGroupIdLanguageEnum,
         )
         .catch((err) => {
           console.error('ESI API call failed:', err.message);
         })
         .then((response) => response?.data);
     }
-    if (group.value?.category_id) {
+    let targetCategoryId: number | undefined;
+    if (newCategoryId) {
+      // Unwrap Ref or function, then convert to number
+      if (typeof newCategoryId === 'function') {
+        targetCategoryId = Number(newCategoryId());
+      } else if (typeof newCategoryId === 'object' && 'value' in newCategoryId) {
+        targetCategoryId = Number(newCategoryId.value);
+      } else {
+        targetCategoryId = Number(newCategoryId);
+      }
+    } else if (group.value?.category_id) {
+      targetCategoryId = Number(group.value.category_id);
+    }
+
+    if (targetCategoryId) {
       category.value = await api
         .getUniverseCategoriesCategoryId(
-          group.value.category_id,
-          newLocale as GetUniverseCategoriesCategoryIdAcceptLanguageEnum,
+          targetCategoryId,
+          newLocale as unknown as GetUniverseCategoriesCategoryIdAcceptLanguageEnum,
           datasource as GetUniverseCategoriesCategoryIdDatasourceEnum,
           undefined,
-          newLocale as GetUniverseCategoriesCategoryIdLanguageEnum,
+          newLocale as unknown as GetUniverseCategoriesCategoryIdLanguageEnum,
         )
         .catch((err) => {
           console.error('ESI API call failed:', err.message);
@@ -66,6 +84,9 @@ watch(
         .then((response) => response?.data);
     }
     loading.value = !(group.value?.group_id || category.value?.category_id);
+    if (!(props.category_id && props.group_id && props.type && props.type.type_id)) {
+      loading.value = false;
+    }
   },
   { immediate: true },
 );
@@ -74,16 +95,20 @@ watch(
   <div v-if="loading"><n-skeleton text style="width: 30%"></n-skeleton></div>
   <n-breadcrumb v-else separator=">">
     <n-breadcrumb-item>
-      <RouterLink to="#">{{ $t('types.catagory') }}</RouterLink>
+      <RouterLink :to="{ name: 'categories' }">{{ $t('types.category') }}</RouterLink>
     </n-breadcrumb-item>
-    <n-breadcrumb-item v-if="category">
-      <n-icon v-if="category.published" :component="Eye" /><n-icon v-else :component="EyeOff" />
-      {{ category.name }}
+    <n-breadcrumb-item v-if="category && Object.keys(category).length > 0">
+      <RouterLink :to="{ name: 'category', params: { categoryid: category.category_id } }">
+        <n-icon v-if="category.published" :component="Eye" /><n-icon v-else :component="EyeOff" />
+        {{ category.name }}
+      </RouterLink>
     </n-breadcrumb-item>
-    <n-breadcrumb-item v-if="group">
-      <n-icon v-if="group.published" :component="Eye" /><n-icon v-else :component="EyeOff" />
-      {{ group.name }}
+    <n-breadcrumb-item v-if="group && Object.keys(group).length > 0">
+      <RouterLink :to="{ name: 'group', params: { groupid: group.group_id } }">
+        <n-icon v-if="group.published" :component="Eye" /><n-icon v-else :component="EyeOff" />
+        {{ group.name }}
+      </RouterLink>
     </n-breadcrumb-item>
-    <n-breadcrumb-item>{{ type.name }}</n-breadcrumb-item>
+    <n-breadcrumb-item v-if="type?.name">{{ type.name }}</n-breadcrumb-item>
   </n-breadcrumb>
 </template>

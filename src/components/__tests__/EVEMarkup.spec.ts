@@ -9,7 +9,7 @@ describe('EVEMarkup', () => {
         html: 'This is a simple text with no markup.',
       },
     });
-    expect(wrapper.html()).toContain('<span>This is a simple text with no markup.</span>');
+    expect(wrapper.html()).toContain('<div>This is a simple text with no markup.</div>');
   });
 
   it('handles empty input', () => {
@@ -18,6 +18,6 @@ describe('EVEMarkup', () => {
         html: '',
       },
     });
-    expect(wrapper.html()).toBe('');
+    expect(wrapper.html()).toBe('<div></div>');
   });
 });

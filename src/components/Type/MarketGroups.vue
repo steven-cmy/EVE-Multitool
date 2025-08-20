@@ -26,12 +26,12 @@ const groups = reactive<GetMarketsGroupsMarketGroupIdOk[]>([]);
 const api = new MarketApi(new Configuration(), undefined, axiosInstance);
 
 watch(
-  [type.value, () => langStore.getShortLocale()],
-  async ([newType, newLocale]) => {
+  [()=>type.value.market_group_id, () => langStore.getShortLocale()],
+  async ([newId, newLocale]) => {
     loading.value = true;
     const datasource = 'tranquility';
-    if (newType.market_group_id) {
-      if (newType.market_group_id) {
+    if (newId) {
+      if (newId) {
         groups.length = 0;
         const fetchGroupHierarchy = async (groupId: number): Promise<void> => {
           const data = await api
@@ -55,7 +55,7 @@ watch(
           }
         };
 
-        await fetchGroupHierarchy(newType.market_group_id);
+        await fetchGroupHierarchy(newId);
       }
 
       loading.value = groups.length === 0;
