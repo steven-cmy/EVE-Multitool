@@ -24,7 +24,6 @@
       </n-button-group>
     </n-form-item>
   </n-form>
-  {{ formValue }}
 </template>
 <script setup lang="ts">
 import { NButton, NButtonGroup, NForm, NFormItem, NIcon, NInputNumber } from 'naive-ui';

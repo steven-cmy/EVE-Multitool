@@ -69,9 +69,12 @@ import { useRouter } from 'vue-router';
 
 const timezones = [
   'US/Pacific',
+  'US/Mountain',
   'US/Central',
   'US/Eastern',
-  'Atlantic/Reykjavik',
+  'Europe/London',
+  'Europe/Brussels',
+  'Europe/Sofia',
   'Australia/Sydney',
   'Europe/Moscow',
   'Asia/Shanghai',
@@ -93,6 +96,9 @@ const timer = ref<number>();
 
 function goTo(time?: number) {
   // locked.value = time !== undefined;
+  if (time) {
+    ts.value = time.toString();
+  }
 
   const routeConfig =
     time !== undefined
@@ -103,43 +109,20 @@ function goTo(time?: number) {
 }
 
 watch(
-  [() => timestamp, locked, picked],
-  ([newTs, newLock, newPick], [oldTs, , oldPick]) => {
-    console.log(newTs, newLock, newPick);
-    if (newLock) {
-      if (newPick !== undefined) {
-        goTo(newPick);
-      } else {
+  [locked, () => timestamp, picked],
+  ([lock, newTs, newPick], [, oldTs, oldPick]) => {
+    if (lock) {
+      if (!timestamp) {
         goTo(now.value);
       }
-    } else {
-      goTo();
-      // locked.value = newTs !== '';
     }
-
-    // // Handle timestamp change
-    // if (newTs && newTs !== oldTs) {
-    //   ts.value = (parseInt(newTs) * 1000).toString();
-    //   locked.value = newTs !== undefined;
-    //   return;
-    // }
-
-    // if (newTs && newTs !== '') {
-    //   goTo(parseInt(newTs) * 1000);
-    // }
-
-    // // Handle picked value change
-    // if (newPick && newPick !== oldPick) {
-    //   goTo(newPick);
-    //   return;
-    // }
-
-    // // Handle lock state
-    // if (newLock && !newPick) {
-    //   goTo(now.value);
-    // } else if (!newLock) {
-    //   goTo();
-    // }
+    if (newTs && newTs !== oldTs) {
+      locked.value = true;
+    }
+    if (newPick && newPick !== oldPick) {
+      locked.value = true;
+      goTo(newPick);
+    }
   },
   { immediate: true },
 );
@@ -147,10 +130,16 @@ watch(
 onMounted(() => {
   timer.value = setInterval(() => {
     now.value = Date.now();
-    if (!locked.value) {
+    if (locked.value) {
+      if (timestamp) {
+        ts.value = (parseInt(timestamp) * 1000).toString();
+      } else {
+        goTo(now.value);
+      }
+    } else {
       ts.value = now.value.toString();
     }
-  }, 1000);
+  }, 100);
 });
 
 onUnmounted(() => {
