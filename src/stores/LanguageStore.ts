@@ -3,6 +3,11 @@ import { defineStore } from 'pinia';
 import { useI18n } from 'vue-i18n';
 import * as naiveUI from 'naive-ui';
 
+type UILocale = {
+  locale: NLocale;
+  dateLocale: NDateLocale;
+};
+
 export const useLanguageStore = defineStore('LanguageStore', () => {
   const i18n = useI18n();
 
@@ -39,11 +44,13 @@ export const useLanguageStore = defineStore('LanguageStore', () => {
 
   const getUILocales = () => {
     const { availableLocales } = i18n;
-    const locales: Record<string, Record<string, NLocale | NDateLocale>> = {};
-    availableLocales.map((loc) => {
+    const locales: Record<string, UILocale> = {};
+    availableLocales.forEach((loc) => {
       locales[loc] = {
-        locale: naiveUI[dense(loc) as keyof typeof naiveUI] as NLocale,
-        dateLocale: naiveUI[getDateLocale(dense(loc)) as keyof typeof naiveUI] as NDateLocale,
+        locale: (naiveUI[dense(loc) as keyof typeof naiveUI] as NLocale) ?? naiveUI['enUS'],
+        dateLocale:
+          (naiveUI[getDateLocale(dense(loc)) as keyof typeof naiveUI] as NDateLocale) ||
+          (naiveUI.dateEnUS as NDateLocale),
       };
     });
     return locales;
