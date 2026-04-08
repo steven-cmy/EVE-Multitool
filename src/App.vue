@@ -30,9 +30,14 @@ const dLoc = ref<NDateLocale | null>(null);
 watch(
   () => langStore.getLocale(),
   (newLocale) => {
-    const { locale, dateLocale } = langStore.getUILocales()[newLocale];
-    loc.value = locale as NLocale;
-    dLoc.value = dateLocale as NDateLocale;
+    const uiLocale = langStore.getUILocales()[newLocale];
+    if (uiLocale) {
+      loc.value = uiLocale.locale as NLocale;
+      dLoc.value = uiLocale.dateLocale as NDateLocale;
+    } else {
+      loc.value = null;
+      dLoc.value = null;
+    }
   },
   { immediate: true },
 );
