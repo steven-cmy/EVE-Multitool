@@ -1,4 +1,5 @@
 import axios, {
+  type AxiosResponse,
   type AxiosResponseHeaders,
   type InternalAxiosRequestConfig,
   type RawAxiosResponseHeaders,
@@ -7,18 +8,27 @@ import Dexie, { type EntityTable } from 'dexie';
 
 export const axiosInstance = axios.create();
 
-interface ESIQuery {
+const DEBUG = true; // Set to false in production
+const log = (...args: unknown[]) => {
+  if (DEBUG) {
+    console.log(...args);
+  }
+};
+
+interface ESIResponse {
   query: string;
-  data: object;
-  headers: {
-    etag: string;
-    expires: Date;
-    [key: string]: unknown;
+  response: {
+    [lang: string]: {
+      data: object;
+      headers: {
+        [key: string]: unknown;
+      };
+    };
   };
 }
 
 const db = new Dexie('EVEMultitool') as Dexie & {
-  entries: EntityTable<ESIQuery, 'query'>;
+  entries: EntityTable<ESIResponse, 'query'>;
 };
 db.version(1).stores({
   entries: 'query',
@@ -74,6 +84,57 @@ const getQuery = (config: InternalAxiosRequestConfig<unknown>) => {
   return `${config.url}`;
 };
 
+const getCachedResponse = async (cacheKey: string, lang: string) => {
+  try {
+    const q = await cache.get(cacheKey);
+    if (q && q.response[lang]) {
+      return q.response[lang];
+    }
+  } catch (error) {
+    console.warn('Cache read failed:', error);
+  }
+  return null;
+};
+
+const cacheResponse = async (cacheKey: string, response: AxiosResponse) => {
+  const lang = response.headers['content-language'];
+  const cached = await getCachedResponse(cacheKey, lang);
+  const esiResponse = {
+    data: response.data,
+    headers: {
+      ...response.headers,
+    },
+  };
+  try {
+    if (cached) {
+      // Update existing cache entry
+      log(`Updating cache for ${cacheKey} with language ${lang}`, esiResponse);
+      await cache.update(cacheKey, (entry) => {
+        entry.response[lang] = esiResponse;
+      });
+    } else {
+      const q = await cache.get(cacheKey);
+      if (!q) {
+        log(`Creating new cache entry for ${cacheKey} with language ${lang}`, esiResponse);
+        await cache.put({
+          query: cacheKey,
+          response: {
+            [lang]: esiResponse,
+          },
+        });
+      } else {
+        // Add new language to existing cache entry
+        log(`Adding new language ${lang} to existing cache entry for ${cacheKey}`, esiResponse);
+        await cache.update(cacheKey, (entry) => {
+          entry.response[lang] = esiResponse;
+        });
+      }
+    }
+  } catch (error) {
+    console.warn('Cache write failed:', error);
+  }
+};
+
 axiosInstance.interceptors.request.use(async (config) => {
   // Check error limit before making any request
   if (shouldBlockRequest()) {
@@ -87,17 +148,13 @@ axiosInstance.interceptors.request.use(async (config) => {
   }
 
   const cacheKey = getQuery(config);
-  let cached = null;
-  try {
-    cached = await cache.get(cacheKey);
-  } catch (error) {
-    console.warn('Cache read failed:', error);
-  }
+  const cached = await getCachedResponse(cacheKey, config.headers['Accept-Language'] || 'en');
 
   if (cached) {
     config.headers.set('If-None-Match', cached.headers.etag);
     const expirationDate = new Date(cached.headers.expires);
     if (!isNaN(expirationDate.getTime()) && expirationDate > new Date()) {
+      log(`Cache HIT for ${cacheKey} in ${config.headers['Accept-Language']}!`, cached);
       // Return cached response
       return Promise.reject({
         __cached: true,
@@ -106,6 +163,9 @@ axiosInstance.interceptors.request.use(async (config) => {
         config: config,
       });
     }
+  } else {
+    log(`Cache MISS for ${cacheKey} in ${config.headers['Accept-Language']}!`);
+    config.headers.set('If-None-Match', '');
   }
   return config;
 });
@@ -117,21 +177,12 @@ axiosInstance.interceptors.response.use(
 
     // Cache responses
     const cacheKey = getQuery(response.config);
-    try {
-      cache.put({
-        query: cacheKey,
-        data: response.data,
-        headers: response.headers,
-      });
-    } catch (error) {
-      console.warn('Cache write failed:', error);
-    }
+    await cacheResponse(cacheKey, response);
     return response;
   },
   async (error) => {
     // Handle special error cases first
     if (error.__cached) {
-      console.log('Cache HIT!');
       return Promise.resolve({
         status: 200,
         statusText: 'OK',
@@ -169,7 +220,7 @@ axiosInstance.interceptors.response.use(
             console.warn('Cache update failed:', error);
           }
         }
-        console.log('Cache HIT!(304)');
+        log('Cache HIT!(304)');
         // Return cached data with 200 status
         return Promise.resolve({
           data: cached.data,

@@ -5,27 +5,24 @@ import TypeImage from '@/components/Type/TypeImage.vue';
 import {
   Configuration,
   GetUniverseCategoriesCategoryIdAcceptLanguageEnum,
-  GetUniverseCategoriesCategoryIdDatasourceEnum,
-  GetUniverseCategoriesCategoryIdLanguageEnum,
   GetUniverseGroupsGroupIdAcceptLanguageEnum,
-  GetUniverseGroupsGroupIdDatasourceEnum,
-  GetUniverseGroupsGroupIdLanguageEnum,
   GetUniverseTypesTypeIdAcceptLanguageEnum,
-  GetUniverseTypesTypeIdDatasourceEnum,
-  GetUniverseTypesTypeIdLanguageEnum,
+  GetUniverseTypesTypeIdXCompatibilityDateEnum,
   UniverseApi,
-  type GetUniverseCategoriesCategoryIdOk,
-  type GetUniverseGroupsGroupIdOk,
-  type GetUniverseTypesTypeIdOk,
+  type UniverseCategoriesCategoryIdGet,
+  type UniverseGroupsGroupIdGet,
+  type UniverseTypesTypeIdGet,
 } from 'eve-esi-client-ts';
 import { axiosInstance } from '@/api/esi';
 import { useLanguageStore } from '@/stores/LanguageStore';
 
+const xCompatibilityDate = GetUniverseTypesTypeIdXCompatibilityDateEnum._20260609;
+const xTenant = 'tranquility';
 const loading = ref(true);
 const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
 const langStore = useLanguageStore();
 const data = ref<
-  GetUniverseTypesTypeIdOk | GetUniverseGroupsGroupIdOk | GetUniverseCategoriesCategoryIdOk
+  UniverseTypesTypeIdGet | UniverseGroupsGroupIdGet | UniverseCategoriesCategoryIdGet
 >();
 const props = defineProps({
   id: {
@@ -46,31 +43,33 @@ watch(
     if (id && type) {
       data.value = undefined;
       const request = () => {
-        const datasource = 'tranquility';
         switch (type) {
           case 'type':
             return api.getUniverseTypesTypeId(
               id,
+              xCompatibilityDate,
               newLocale as GetUniverseTypesTypeIdAcceptLanguageEnum,
-              datasource as GetUniverseTypesTypeIdDatasourceEnum,
               undefined,
-              newLocale as GetUniverseTypesTypeIdLanguageEnum,
+              xTenant,
+              undefined,
             );
           case 'group':
             return api.getUniverseGroupsGroupId(
               id,
+              xCompatibilityDate,
               newLocale as GetUniverseGroupsGroupIdAcceptLanguageEnum,
-              datasource as GetUniverseGroupsGroupIdDatasourceEnum,
               undefined,
-              newLocale as GetUniverseGroupsGroupIdLanguageEnum,
+              xTenant,
+              undefined,
             );
           case 'category':
             return api.getUniverseCategoriesCategoryId(
               id,
+              xCompatibilityDate,
               newLocale as GetUniverseCategoriesCategoryIdAcceptLanguageEnum,
-              datasource as GetUniverseCategoriesCategoryIdDatasourceEnum,
               undefined,
-              newLocale as GetUniverseCategoriesCategoryIdLanguageEnum,
+              xTenant,
+              undefined,
             );
         }
       };

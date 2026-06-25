@@ -2,16 +2,15 @@
 import { reactive, ref, watch } from 'vue';
 // import EVEMarkup from '@/components/EVEMarkup.vue';
 // import MarketGroups from '@/components/Type/MarketGroups.vue';
-import CategoryGroup from '@/components/Type/CategoryGroup.vue';
+// import CategoryGroup from '@/components/Type/CategoryGroup.vue';
 import TypeImage from '@/components/Type/TypeImage.vue';
 import { axiosInstance } from '@/api/esi';
 import {
   UniverseApi,
   Configuration,
   GetUniverseTypesTypeIdAcceptLanguageEnum,
-  GetUniverseTypesTypeIdDatasourceEnum,
-  GetUniverseTypesTypeIdLanguageEnum,
-  type GetUniverseTypesTypeIdOk,
+  GetUniverseTypesTypeIdXCompatibilityDateEnum,
+  type UniverseTypesTypeIdGet,
 } from 'eve-esi-client-ts';
 import { NCard, NSkeleton, NThing, NH1 } from 'naive-ui';
 import { useLanguageStore } from '@/stores/LanguageStore';
@@ -23,8 +22,9 @@ const { typeid } = defineProps({
   typeid: String,
 });
 const loading = ref(true);
-const type = reactive<GetUniverseTypesTypeIdOk>({} as GetUniverseTypesTypeIdOk);
+const type = reactive<UniverseTypesTypeIdGet>({} as UniverseTypesTypeIdGet);
 const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
+const xCompatibilityDate = GetUniverseTypesTypeIdXCompatibilityDateEnum._20260609;
 const langStore = useLanguageStore();
 
 watch(
@@ -33,14 +33,20 @@ watch(
     const newTypeId = parseInt(newId as string);
     if (newTypeId || newLocale) {
       loading.value = true;
-      const datasource = GetUniverseTypesTypeIdDatasourceEnum.Tranquility;
       const data = await api
         .getUniverseTypesTypeId(
           newTypeId,
-          newLocale as GetUniverseTypesTypeIdAcceptLanguageEnum,
-          datasource,
+          xCompatibilityDate,
           undefined,
-          newLocale as GetUniverseTypesTypeIdLanguageEnum,
+          undefined,
+          undefined,
+          undefined,
+          {
+            headers: {
+              'Accept-Language': newLocale as GetUniverseTypesTypeIdAcceptLanguageEnum,
+              'X-Tenant': 'tranquility',
+            },
+          },
         )
         .catch((err) => {
           console.error('ESI API call failed:', err.message);
@@ -48,7 +54,9 @@ watch(
             // name: 'not-found',
           });
         })
-        .then((response) => response?.data);
+        .then((response) => {
+          return response?.data;
+        });
       Object.assign(type, data);
       loading.value = Object.keys(type).length === 0;
     }
@@ -58,32 +66,31 @@ watch(
 </script>
 
 <template>
-  <CategoryGroup :type="type" />
+  <!-- <CategoryGroup :type="type" /> -->
   <!-- <MarketGroups :type="type" /> -->
   <main>
-    <n-card embedded style="margin-top: 2vh;">
+    <n-card embedded style="margin-top: 2vh">
       <n-thing>
-      <template #avatar>
-        <n-skeleton v-if="loading" height="64px" width="64px" />
-        <TypeImage v-else :typeid="type.type_id" />
-      </template>
-      <template #header>
-        <n-skeleton v-if="loading" text style="width: 20%" />
-        <n-h1 v-else>
-          {{ type.name }}
-        </n-h1>
-      </template>
-      <template #header-extra>
-        {{ type.type_id }}
-      </template>
-      <!-- <template #description>
+        <template #avatar>
+          <n-skeleton v-if="loading" height="64px" width="64px" />
+          <TypeImage v-else :typeid="type.type_id" />
+        </template>
+        <template #header>
+          <n-skeleton v-if="loading" text style="width: 20%" />
+          <n-h1 v-else>
+            {{ type.name }}
+          </n-h1>
+        </template>
+        <template #header-extra>
+          {{ type.type_id }}
+        </template>
+        <!-- <template #description>
         <n-text>
           <EVEMarkup :html="type.description" />
         </n-text>
       </template> -->
-      <TypeAttributes :type="type" />
-    </n-thing>
+        <TypeAttributes :type="type" />
+      </n-thing>
     </n-card>
-
   </main>
 </template>

@@ -4,39 +4,37 @@ import { NSkeleton, NBreadcrumb, NBreadcrumbItem, NIcon } from 'naive-ui';
 import {
   Configuration,
   GetUniverseCategoriesCategoryIdAcceptLanguageEnum,
-  GetUniverseCategoriesCategoryIdDatasourceEnum,
-  GetUniverseCategoriesCategoryIdLanguageEnum,
-  type GetUniverseCategoriesCategoryIdOk,
+  type UniverseCategoriesCategoryIdGet,
+  GetUniverseCategoriesCategoryIdXCompatibilityDateEnum,
   GetUniverseGroupsGroupIdAcceptLanguageEnum,
-  GetUniverseGroupsGroupIdDatasourceEnum,
-  GetUniverseGroupsGroupIdLanguageEnum,
-  type GetUniverseGroupsGroupIdOk,
-  type GetUniverseTypesTypeIdOk,
+  type UniverseGroupsGroupIdGet,
+  type UniverseTypesTypeIdGet,
   UniverseApi,
 } from 'eve-esi-client-ts';
 import { axiosInstance } from '@/api/esi';
 import { useLanguageStore } from '@/stores/LanguageStore';
 import { Eye, EyeOff } from '@vicons/tabler';
 
+const xCompatibilityDate = GetUniverseCategoriesCategoryIdXCompatibilityDateEnum._20260609;
+const xTenant = 'tranquility';
 const langStore = useLanguageStore();
 const loading = ref(true);
 const props = defineProps({
-  type: Object as () => GetUniverseTypesTypeIdOk,
+  type: Object as () => UniverseTypesTypeIdGet,
   group_id: String,
   category_id: String,
 });
 const { type, group_id, category_id } = toRefs(props);
-const group = ref<GetUniverseGroupsGroupIdOk>();
-const category = ref<GetUniverseCategoriesCategoryIdOk>();
+const group = ref<UniverseGroupsGroupIdGet>();
+const category = ref<UniverseCategoriesCategoryIdGet>();
 const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
 
 watch(
   [() => type?.value?.group_id, group_id, category_id, () => langStore.getShortLocale()],
   async ([newTypeGroupId, newGroupId, newCategoryId, newLocale]) => {
     loading.value = true;
-    group.value = {} as GetUniverseGroupsGroupIdOk;
-    category.value = {} as GetUniverseCategoriesCategoryIdOk;
-    const datasource = 'tranquility';
+    group.value = {} as UniverseGroupsGroupIdGet;
+    category.value = {} as UniverseCategoriesCategoryIdGet;
 
     // Ensure targetGroupId is a number
     const rawGroupId = newGroupId ?? newTypeGroupId;
@@ -45,10 +43,11 @@ watch(
       group.value = await api
         .getUniverseGroupsGroupId(
           Number(targetGroupId),
+          xCompatibilityDate,
           newLocale as unknown as GetUniverseGroupsGroupIdAcceptLanguageEnum,
-          datasource as GetUniverseGroupsGroupIdDatasourceEnum,
           undefined,
-          newLocale as unknown as GetUniverseGroupsGroupIdLanguageEnum,
+          xTenant,
+          undefined,
         )
         .catch((err) => {
           console.error('ESI API call failed:', err.message);
@@ -73,10 +72,11 @@ watch(
       category.value = await api
         .getUniverseCategoriesCategoryId(
           targetCategoryId,
+          xCompatibilityDate,
           newLocale as unknown as GetUniverseCategoriesCategoryIdAcceptLanguageEnum,
-          datasource as GetUniverseCategoriesCategoryIdDatasourceEnum,
           undefined,
-          newLocale as unknown as GetUniverseCategoriesCategoryIdLanguageEnum,
+          xTenant,
+          undefined,
         )
         .catch((err) => {
           console.error('ESI API call failed:', err.message);
