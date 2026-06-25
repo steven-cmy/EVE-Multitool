@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { NTabs, NTabPane } from 'naive-ui';
-import type { GetUniverseTypesTypeIdOk } from 'eve-esi-client-ts';
+import type { UniverseTypesTypeIdGet } from 'eve-esi-client-ts';
 import { toRefs } from 'vue';
 import { useI18n } from 'vue-i18n';
 import EVEMarkup from '../EVEMarkup.vue';
@@ -8,8 +8,8 @@ import EVEMarkup from '../EVEMarkup.vue';
 const i18n = useI18n();
 const props = defineProps({
   type: {
-    type: Object as () => GetUniverseTypesTypeIdOk,
-    default: {} as GetUniverseTypesTypeIdOk,
+    type: Object as () => UniverseTypesTypeIdGet,
+    default: {} as UniverseTypesTypeIdGet,
   },
 });
 const { type } = toRefs(props);

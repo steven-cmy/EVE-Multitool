@@ -4,32 +4,32 @@ import { NSkeleton, NBreadcrumb, NBreadcrumbItem, NPopover } from 'naive-ui';
 import {
   Configuration,
   GetMarketsGroupsMarketGroupIdAcceptLanguageEnum,
-  GetMarketsGroupsMarketGroupIdDatasourceEnum,
-  GetMarketsGroupsMarketGroupIdLanguageEnum,
-  type GetMarketsGroupsMarketGroupIdOk,
-  type GetUniverseTypesTypeIdOk,
+  type MarketsGroupsMarketGroupIdGet,
+  GetMarketsGroupsMarketGroupIdXCompatibilityDateEnum,
+  type UniverseTypesTypeIdGet,
   MarketApi,
 } from 'eve-esi-client-ts';
 import { axiosInstance } from '@/api/esi';
 import { useLanguageStore } from '@/stores/LanguageStore';
 
+const xCompatibilityDate = GetMarketsGroupsMarketGroupIdXCompatibilityDateEnum._20260609;
+const xTenant = 'tranquility';
 const langStore = useLanguageStore();
 const loading = ref(true);
 const props = defineProps({
   type: {
-    type: Object as () => GetUniverseTypesTypeIdOk,
-    default: {} as GetUniverseTypesTypeIdOk,
+    type: Object as () => UniverseTypesTypeIdGet,
+    default: {} as UniverseTypesTypeIdGet,
   },
 });
 const { type } = toRefs(props);
-const groups = reactive<GetMarketsGroupsMarketGroupIdOk[]>([]);
+const groups = reactive<MarketsGroupsMarketGroupIdGet[]>([]);
 const api = new MarketApi(new Configuration(), undefined, axiosInstance);
 
 watch(
   [()=>type.value.market_group_id, () => langStore.getShortLocale()],
   async ([newId, newLocale]) => {
     loading.value = true;
-    const datasource = 'tranquility';
     if (newId) {
       if (newId) {
         groups.length = 0;
@@ -37,10 +37,11 @@ watch(
           const data = await api
             .getMarketsGroupsMarketGroupId(
               groupId,
+              xCompatibilityDate,
               newLocale as GetMarketsGroupsMarketGroupIdAcceptLanguageEnum,
-              datasource as GetMarketsGroupsMarketGroupIdDatasourceEnum,
               undefined,
-              newLocale as GetMarketsGroupsMarketGroupIdLanguageEnum,
+              xTenant,
+              undefined,
             )
             .catch((err) => {
               console.error('ESI API call failed:', err.message);

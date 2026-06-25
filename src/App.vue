@@ -52,7 +52,7 @@ watch(
             <RouterLink to="/" style="height: 100%; padding: 0"><EVExcel /></RouterLink>
             <nav>
               <RouterLink :to="{ name: 'home' }">{{ $t('test') }}</RouterLink>
-              <!-- <RouterLink :to="{ name: 'categories' }">{{ $t('types.category') }}</RouterLink> -->
+              <RouterLink :to="{ name: 'categories' }">{{ $t('types.category') }}</RouterLink>
               <RouterLink :to="{ name: 'epoch' }">{{ $t('epoch.title') }}</RouterLink>
             </nav>
           </n-flex>

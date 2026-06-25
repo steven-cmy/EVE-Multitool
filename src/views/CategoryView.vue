@@ -5,17 +5,17 @@ import { useLanguageStore } from '@/stores/LanguageStore';
 import {
   Configuration,
   GetUniverseCategoriesCategoryIdAcceptLanguageEnum,
-  GetUniverseCategoriesCategoryIdDatasourceEnum,
-  GetUniverseCategoriesCategoryIdLanguageEnum,
-  GetUniverseCategoriesDatasourceEnum,
+  GetUniverseTypesXCompatibilityDateEnum,
   UniverseApi,
-  type GetUniverseCategoriesCategoryIdOk,
+  type UniverseCategoriesCategoryIdGet,
 } from 'eve-esi-client-ts';
 import { ref, watch } from 'vue';
 import { NSkeleton, NPagination, NList, NH1 } from 'naive-ui';
 import { useRoute } from 'vue-router';
 import TypeListItems from '@/components/Type/TypeListItems.vue';
 
+const xCompatibilityDate = GetUniverseTypesXCompatibilityDateEnum._20260609;
+const xTenant = 'tranquility';
 const langStore = useLanguageStore();
 const loading = ref(true);
 const route = useRoute();
@@ -25,7 +25,7 @@ const { categoryid } = defineProps({
   },
 });
 const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
-const category = ref<GetUniverseCategoriesCategoryIdOk>();
+const category = ref<UniverseCategoriesCategoryIdGet>();
 const categories = ref<number[]>();
 const page = ref<number>(route.query.page ? parseInt(route.query.page as string) : 1);
 const page_size = ref<number>(
@@ -36,17 +36,18 @@ watch(
   [() => categoryid, () => langStore.getShortLocale()],
   async ([newId, newLocale]) => {
     loading.value = true;
-    category.value = {} as GetUniverseCategoriesCategoryIdOk;
+    category.value = {} as UniverseCategoriesCategoryIdGet;
     categories.value = [];
-    const datasource = 'tranquility';
+
     if (newId) {
       category.value = await api
         .getUniverseCategoriesCategoryId(
           parseInt(newId),
+          xCompatibilityDate,
           newLocale as GetUniverseCategoriesCategoryIdAcceptLanguageEnum,
-          datasource as GetUniverseCategoriesCategoryIdDatasourceEnum,
           undefined,
-          newLocale as GetUniverseCategoriesCategoryIdLanguageEnum,
+          xTenant,
+          undefined,
         )
         .catch((err) => {
           console.error('ESI API call failed:', err.message);
@@ -55,7 +56,13 @@ watch(
       loading.value = category.value === undefined || Object.keys(category.value).length === 0;
     } else {
       categories.value = await api
-        .getUniverseCategories(datasource as GetUniverseCategoriesDatasourceEnum)
+        .getUniverseCategories(
+          xCompatibilityDate,
+          newLocale as GetUniverseCategoriesCategoryIdAcceptLanguageEnum,
+          undefined,
+          xTenant,
+          undefined,
+        )
         .catch((err) => {
           console.error('ESI API call failed:', err.message);
         })
@@ -76,7 +83,7 @@ watch(
       <template #footer>
         <n-pagination
           :item-count="0"
-          :page-sizes="[10, 20, 30, 40]"
+          :page-sizes="[10, 25, 50, 100]"
           show-quick-jumper
           show-size-picker
           @update:page="page = $event"
@@ -96,7 +103,7 @@ watch(
       <template #footer>
         <n-pagination
           :item-count="(category?.groups ? category.groups : categories)?.length"
-          :page-sizes="[10, 20, 30, 40]"
+          :page-sizes="[10, 25, 50, 100]"
           show-quick-jumper
           show-size-picker
           @update:page="page = $event"
