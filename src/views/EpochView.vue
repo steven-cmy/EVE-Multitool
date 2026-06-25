@@ -33,7 +33,7 @@
   <n-flex justify="space-between" align="center">
     <CopyToDiscord :timestamp="ts" />
     <n-flex vertical>
-      <n-date-picker v-model:value="picked" type="datetime" clearable />
+      <DatePicker v-model="picked" />
       <TimeCalculator :timestamp="ts" />
     </n-flex>
   </n-flex>
@@ -50,7 +50,6 @@
 <script setup lang="ts">
 import {
   NButton,
-  NDatePicker,
   NDivider,
   NFlex,
   NGrid,
@@ -66,6 +65,7 @@ import TimeCalculator from '@/components/Epoch/TimeCalculator.vue';
 import CopyToDiscord from '@/components/Epoch/CopyToDiscord.vue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import DatePicker from '@/components/Epoch/DatePicker.vue';
 
 const timezones = [
   'US/Pacific',
