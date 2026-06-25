@@ -5,16 +5,17 @@ import { useLanguageStore } from '@/stores/LanguageStore';
 import {
   Configuration,
   GetUniverseGroupsGroupIdAcceptLanguageEnum,
-  GetUniverseGroupsGroupIdDatasourceEnum,
-  GetUniverseGroupsGroupIdLanguageEnum,
+  GetUniverseGroupsGroupIdXCompatibilityDateEnum,
   UniverseApi,
-  type GetUniverseGroupsGroupIdOk,
+  type UniverseGroupsGroupIdGet,
 } from 'eve-esi-client-ts';
 import { ref, watch } from 'vue';
 import { NPagination, NList, NH1 } from 'naive-ui';
 import { useRoute } from 'vue-router';
 import TypeListItems from '@/components/Type/TypeListItems.vue';
 
+const xCompatibilityDate = GetUniverseGroupsGroupIdXCompatibilityDateEnum._20260609;
+const xTenant = 'tranquility';
 const langStore = useLanguageStore();
 const loading = ref(true);
 const route = useRoute();
@@ -25,7 +26,7 @@ const { groupid } = defineProps({
   },
 });
 const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
-const group = ref<GetUniverseGroupsGroupIdOk>();
+const group = ref<UniverseGroupsGroupIdGet>();
 const page = ref<number>(route.query.page ? parseInt(route.query.page as string) : 1);
 const page_size = ref<number>(
   route.query.page_size ? parseInt(route.query.page_size as string) : 10,
@@ -35,15 +36,15 @@ watch(
   [() => groupid, () => langStore.getShortLocale()],
   async ([newId, newLocale]) => {
     loading.value = true;
-    group.value = {} as GetUniverseGroupsGroupIdOk;
-    const datasource = 'tranquility';
+    group.value = {} as UniverseGroupsGroupIdGet;
     group.value = await api
       .getUniverseGroupsGroupId(
         parseInt(newId),
+        xCompatibilityDate,
         newLocale as GetUniverseGroupsGroupIdAcceptLanguageEnum,
-        datasource as GetUniverseGroupsGroupIdDatasourceEnum,
         undefined,
-        newLocale as GetUniverseGroupsGroupIdLanguageEnum,
+        xTenant,
+        undefined,
       )
       .catch((err) => {
         console.error('ESI API call failed:', err.message);
@@ -64,7 +65,7 @@ watch(
       <template #footer>
         <n-pagination
           :item-count="group.types.length"
-          :page-sizes="[10, 20, 30, 40]"
+          :page-sizes="[10, 25, 50, 100]"
           show-quick-jumper
           show-size-picker
           @update:page="page = $event"
