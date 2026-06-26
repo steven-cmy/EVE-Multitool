@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue';
-// import EVEMarkup from '@/components/EVEMarkup.vue';
-// import MarketGroups from '@/components/Type/MarketGroups.vue';
-// import CategoryGroup from '@/components/Type/CategoryGroup.vue';
+import EVEMarkup from '@/components/EVEMarkup.vue';
+import MarketGroups from '@/components/Type/MarketGroups.vue';
+import CategoryGroup from '@/components/Type/CategoryGroup.vue';
 import TypeImage from '@/components/Type/TypeImage.vue';
 import { axiosInstance } from '@/api/esi';
 import {
@@ -25,6 +25,7 @@ const loading = ref(true);
 const type = reactive<UniverseTypesTypeIdGet>({} as UniverseTypesTypeIdGet);
 const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
 const xCompatibilityDate = GetUniverseTypesTypeIdXCompatibilityDateEnum._20260609;
+const xTenant = 'tranquility';
 const langStore = useLanguageStore();
 
 watch(
@@ -37,16 +38,10 @@ watch(
         .getUniverseTypesTypeId(
           newTypeId,
           xCompatibilityDate,
+          newLocale as GetUniverseTypesTypeIdAcceptLanguageEnum,
           undefined,
+          xTenant,
           undefined,
-          undefined,
-          undefined,
-          {
-            headers: {
-              'Accept-Language': newLocale as GetUniverseTypesTypeIdAcceptLanguageEnum,
-              'X-Tenant': 'tranquility',
-            },
-          },
         )
         .catch((err) => {
           console.error('ESI API call failed:', err.message);
@@ -66,8 +61,8 @@ watch(
 </script>
 
 <template>
-  <!-- <CategoryGroup :type="type" /> -->
-  <!-- <MarketGroups :type="type" /> -->
+  <CategoryGroup :type="type" />
+  <MarketGroups :type="type" />
   <main>
     <n-card embedded style="margin-top: 2vh">
       <n-thing>
@@ -84,11 +79,11 @@ watch(
         <template #header-extra>
           {{ type.type_id }}
         </template>
-        <!-- <template #description>
+        <template #description>
         <n-text>
           <EVEMarkup :html="type.description" />
         </n-text>
-      </template> -->
+      </template>
         <TypeAttributes :type="type" />
       </n-thing>
     </n-card>

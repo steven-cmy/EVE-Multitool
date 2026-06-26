@@ -1,41 +1,41 @@
 <template>
-  <n-h1>
-    <n-flex justify="space-between" align="center">
+  <n-flex justify="space-between" align="center">
+    <n-h1>
       <Transition name="fade">
         <n-time v-if="locked" :time="parseInt(ts)" :to="now" type="relative" />
       </Transition>
       &nbsp;
-      <n-flex align="center">
-        <Transition name="slide-fade">
-          <span v-if="locked">
-            <n-button text @click="goTo(now)">
-              <template #icon>
-                <NIcon>
-                  <Clock />
-                </NIcon>
-              </template>
-              {{ $t('epoch.live') }}
-            </n-button>
-            <n-divider vertical />
-          </span>
-        </Transition>
-        <n-switch v-model:value="locked" size="large">
-          <template #checked-icon>
-            <n-icon :component="Lock" />
-          </template>
-          <template #unchecked-icon>
-            <n-icon :component="LockOpen" />
-          </template>
-        </n-switch>
-      </n-flex>
+    </n-h1>
+    <n-flex align="center">
+      <Transition name="slide-fade">
+        <span v-if="locked">
+          <n-button text @click="goTo(now)">
+            <template #icon>
+              <NIcon>
+                <Clock />
+              </NIcon>
+            </template>
+            {{ $t('epoch.live') }}
+          </n-button>
+          <n-divider vertical />
+        </span>
+      </Transition>
+
+      <n-switch v-model:value="locked" size="large">
+        <template #checked-icon>
+          <n-icon :component="Lock" />
+        </template>
+        <template #unchecked-icon>
+          <n-icon :component="LockOpen" />
+        </template>
+      </n-switch>
+      <DatePicker v-model="picked" />
     </n-flex>
-  </n-h1>
+  </n-flex>
+
   <n-flex justify="space-between" align="center">
     <CopyToDiscord :timestamp="ts" />
-    <n-flex vertical>
-      <DatePicker v-model="picked" />
-      <TimeCalculator :timestamp="ts" />
-    </n-flex>
+    <TimeCalculator :timestamp="ts" />
   </n-flex>
   <n-grid x-gap="12" y-gap="8" :cols="5">
     <n-grid-item>
@@ -48,17 +48,7 @@
   </n-grid>
 </template>
 <script setup lang="ts">
-import {
-  NButton,
-  NDivider,
-  NFlex,
-  NGrid,
-  NGridItem,
-  NH1,
-  NIcon,
-  NSwitch,
-  NTime,
-} from 'naive-ui';
+import { NButton, NDivider, NFlex, NGrid, NGridItem, NH1, NIcon, NSwitch, NTime } from 'naive-ui';
 import { Clock, Lock, LockOpen } from '@vicons/tabler';
 import TimeCard from '@/components/Epoch/TimeCard.vue';
 import TimeCalculator from '@/components/Epoch/TimeCalculator.vue';
@@ -109,22 +99,20 @@ function goTo(time?: number) {
 }
 
 watch(
-  [locked, () => timestamp, picked],
-  ([lock, newTs, newPick], [, oldTs, oldPick]) => {
-    if (lock) {
-      if (!timestamp) {
-        goTo(now.value);
-      }
-    }
-    if (newTs && newTs !== oldTs) {
-      locked.value = true;
-    }
-    if (newPick && newPick !== oldPick) {
-      locked.value = true;
+  () => timestamp,
+  (newTs) => {
+    picked.value = newTs ? parseInt(newTs) * 1000 : undefined;
+  },
+  { immediate: true },
+);
+
+watch(
+  () => picked.value,
+  (newPick) => {
+    if (newPick) {
       goTo(newPick);
     }
   },
-  { immediate: true },
 );
 
 onMounted(() => {

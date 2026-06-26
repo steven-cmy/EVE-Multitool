@@ -1,29 +1,35 @@
 <template>
-  <n-form ref="formRef" inline :label-width="80" :model="formValue">
-    <n-form-item v-for="value in values" :key="value" :path="value">
-      <n-input-number
-        v-model:value="formValue[value]"
-        :min="0"
-        :precision="0"
-        :show-button="false"
-      />
-      {{ $t(`epoch.calc.${value}`) }}
-    </n-form-item>
-    <n-form-item>
-      <n-button-group>
-        <n-button @click="plus(true)">
-          <template #icon>
-            <n-icon><Minus /></n-icon>
+  <n-flex align="center">
+    <n-form ref="formRef" inline :label-width="80" :model="formValue">
+      <n-form-item v-for="value in values" :key="value" :path="value">
+        <n-input-number
+          v-model:value="formValue[value]"
+          :min="0"
+          :precision="0"
+          :show-button="false"
+          style="min-width: 100px"
+        >
+          <template #suffix>
+            {{ $t(`epoch.calc.${value}`) }}
           </template>
-        </n-button>
-        <n-button @click="plus()">
-          <template #icon>
-            <n-icon><Plus /></n-icon>
-          </template>
-        </n-button>
-      </n-button-group>
-    </n-form-item>
-  </n-form>
+        </n-input-number>
+      </n-form-item>
+      <n-form-item>
+        <n-button-group>
+          <n-button @click="plus(true)">
+            <template #icon>
+              <n-icon><Minus /></n-icon>
+            </template>
+          </n-button>
+          <n-button @click="plus()">
+            <template #icon>
+              <n-icon><Plus /></n-icon>
+            </template>
+          </n-button>
+        </n-button-group>
+      </n-form-item>
+    </n-form>
+  </n-flex>
 </template>
 <script setup lang="ts">
 import { NButton, NButtonGroup, NForm, NFormItem, NIcon, NInputNumber } from 'naive-ui';
