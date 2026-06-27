@@ -85,7 +85,7 @@ const ts = ref<string>(now.value.toString());
 const timer = ref<number>();
 
 function goTo(time?: number) {
-  // locked.value = time !== undefined;
+  locked.value = time !== undefined;
   if (time) {
     ts.value = time.toString();
   }
