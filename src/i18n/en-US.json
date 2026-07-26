@@ -1,27 +1,38 @@
 {
-    "languageName": "English",
-    "test": "Hello",
-    "types": {
-        "market": "Market",
-        "category": "Category",
-        "attributes": {
-            "description": "Description"
-        }
-    },
-    "epoch": {
-        "title": "Time",
-        "live": "Go to now",
-        "copyDiscord": "Copy Discord timestamp",
-        "UTC": "EVE Time/UTC",
-        "local": "Local Time",
-        "calc": {
-            "year": "Year(s)",
-            "month": "Month(s)",
-            "week": "Week(s)",
-            "day": "Day(s)",
-            "hour": "Hour(s)",
-            "minute": "Min(s)",
-            "second": "Sec(s)"
-        }
+  "languageName": "English",
+  "test": "Hello",
+  "types": {
+    "market": "Market",
+    "category": "Category",
+    "attributes": {
+      "description": "Description"
     }
+  },
+  "epoch": {
+    "title": "Time",
+    "live": "Go to now",
+    "copyDiscord": "Copy Discord timestamp",
+    "UTC": "EVE Time/UTC",
+    "local": "Local Time",
+    "calc": {
+      "year": "Year(s)",
+      "month": "Month(s)",
+      "week": "Week(s)",
+      "day": "Day(s)",
+      "hour": "Hour(s)",
+      "minute": "Min(s)",
+      "second": "Sec(s)"
+    }
+  },
+  "harvest": {
+    "title": "Harvest",
+    "showUnpublished": "Show Unpublished",
+    "hideUnpublished": "Hide Unpublished",
+    "gas": {
+      "gasType": "Gas Type",
+      "unitPrice": "Unit Price",
+      "volume": "Volume",
+      "pricePerVolume": "Price per Volume"
+    }
+  }
 }
