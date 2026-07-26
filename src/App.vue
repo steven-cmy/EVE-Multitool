@@ -54,6 +54,7 @@ watch(
               <RouterLink :to="{ name: 'home' }">{{ $t('test') }}</RouterLink>
               <RouterLink :to="{ name: 'categories' }">{{ $t('types.category') }}</RouterLink>
               <RouterLink :to="{ name: 'epoch' }">{{ $t('epoch.title') }}</RouterLink>
+              <RouterLink :to="{ name: 'harvest' }">{{ $t('harvest.title') }}</RouterLink>
             </nav>
           </n-flex>
 

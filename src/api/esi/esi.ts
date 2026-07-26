@@ -8,7 +8,7 @@ import Dexie, { type EntityTable } from 'dexie';
 
 export const axiosInstance = axios.create();
 
-const DEBUG = true; // Set to false in production
+const DEBUG = false || import.meta.env.VITE_DEBUG; // Set to false in production
 const log = (...args: unknown[]) => {
   if (DEBUG) {
     console.log(...args);
@@ -28,12 +28,12 @@ interface ESIResponse {
 }
 
 const db = new Dexie('EVEMultitool') as Dexie & {
-  entries: EntityTable<ESIResponse, 'query'>;
+  ESI: EntityTable<ESIResponse, 'query'>;
 };
 db.version(1).stores({
-  entries: 'query',
+  ESI: 'query',
 });
-const cache = db.table('entries');
+const cache = db.table('ESI');
 
 // ESI Error Limit state
 let errorLimitRemaining: number = NaN;
