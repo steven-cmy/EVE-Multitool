@@ -4,19 +4,7 @@ import SSOLogin from '@/components/SSOLogin.vue';
 import EVExcel from '@/components/icons/IconEvexcel.vue';
 import LanguageSwitch from '@/components/LanguageSwitch.vue';
 import { computed, ref, watch } from 'vue';
-import {
-  NBackTop,
-  NConfigProvider,
-  NGlobalStyle,
-  darkTheme,
-  lightTheme,
-  NLayout,
-  NLayoutHeader,
-  NLayoutFooter,
-  NFlex,
-  type NLocale,
-  type NDateLocale,
-} from 'naive-ui';
+import { darkTheme, lightTheme, type NLocale, type NDateLocale } from 'naive-ui';
 import LightSwitch from '@/components/LightSwitch.vue';
 import { useDarkmodeStore } from '@/stores/DarkmodeStore';
 import { useLanguageStore } from '@/stores/LanguageStore';
@@ -55,6 +43,7 @@ watch(
               <RouterLink :to="{ name: 'categories' }">{{ $t('types.category') }}</RouterLink>
               <RouterLink :to="{ name: 'epoch' }">{{ $t('epoch.title') }}</RouterLink>
               <RouterLink :to="{ name: 'harvest' }">{{ $t('harvest.title') }}</RouterLink>
+              <RouterLink :to="{ name: 'rdf' }">{{ $t('rdf.title') }}</RouterLink>
             </nav>
           </n-flex>
 
@@ -67,7 +56,7 @@ watch(
       </n-layout-header>
       <n-layout id="main" position="absolute" content-style="padding: 5vw;">
         <RouterView />
-        <n-back-top />
+        <n-back-top :bottom="70" />
       </n-layout>
       <n-layout-footer bordered position="absolute">
         <n-flex justify="end" align="center" style="height: 100%" :wrap="false">

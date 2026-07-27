@@ -10,11 +10,10 @@ import {
   type UniverseGroupsGroupIdGet,
 } from 'eve-esi-client-ts';
 import { ref, watch } from 'vue';
-import { NPagination, NList, NH1 } from 'naive-ui';
 import { useRoute } from 'vue-router';
 import TypeListItems from '@/components/Type/TypeListItems.vue';
 
-const xCompatibilityDate = GetUniverseGroupsGroupIdXCompatibilityDateEnum._20260609;
+const xCompatibilityDate = GetUniverseGroupsGroupIdXCompatibilityDateEnum._20260721;
 const xTenant = 'tranquility';
 const langStore = useLanguageStore();
 const loading = ref(true);

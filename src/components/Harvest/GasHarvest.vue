@@ -22,7 +22,6 @@ import {
   MarketApi,
   UniverseApi,
 } from 'eve-esi-client-ts';
-import { NDataTable } from 'naive-ui';
 import type { DataTableBaseColumn, DataTableColumns, DataTableFilterState } from 'naive-ui';
 import { onMounted, reactive, ref, watch } from 'vue';
 
@@ -59,7 +58,7 @@ const refreshGasPrice = async (
       const data = await universeApi
         .getUniverseTypesTypeId(
           typeId,
-          GetUniverseTypesTypeIdXCompatibilityDateEnum._20260609,
+          GetUniverseTypesTypeIdXCompatibilityDateEnum._20260721,
           locale as GetUniverseTypesTypeIdAcceptLanguageEnum,
           undefined,
           xTenant,
@@ -102,7 +101,7 @@ onMounted(async () => {
   const response = await universeApi
     .getUniverseGroupsGroupId(
       gasCloudGroup,
-      GetUniverseGroupsGroupIdXCompatibilityDateEnum._20260609,
+      GetUniverseGroupsGroupIdXCompatibilityDateEnum._20260721,
       langStore.getShortLocale() as GetUniverseGroupsGroupIdAcceptLanguageEnum,
       undefined,
       xTenant,
@@ -153,7 +152,7 @@ const updateGasFilterOptions = async () => {
       const response = await marketApi
         .getMarketsGroupsMarketGroupId(
           marketGroupId,
-          GetMarketsGroupsMarketGroupIdXCompatibilityDateEnum._20260609,
+          GetMarketsGroupsMarketGroupIdXCompatibilityDateEnum._20260721,
           langStore.getShortLocale() as GetUniverseGroupsGroupIdAcceptLanguageEnum,
           undefined,
           xTenant,

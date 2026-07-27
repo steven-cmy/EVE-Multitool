@@ -8,7 +8,6 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NIcon } from 'naive-ui';
 import { MoonStars, Sun } from '@vicons/tabler';
 import { computed } from 'vue';
 import { useDarkmodeStore } from '@/stores/DarkmodeStore';

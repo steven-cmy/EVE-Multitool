@@ -8,7 +8,6 @@
   </n-flex>
 </template>
 <script setup lang="ts">
-import { NFlex, NSwitch, NDatePicker } from 'naive-ui';
 import { ref, watch } from 'vue';
 
 const time = defineModel<number>(); // The absolute UTC timestamp
