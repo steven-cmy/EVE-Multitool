@@ -9,14 +9,12 @@
 
 <script setup lang="ts">
 import { axiosInstance } from '@/api/esi';
-import { stats } from '@/api/evetycoon/market';
+import { aggregates } from '@/api/fuzzwork/market';
 import i18n from '@/i18n';
 import { useLanguageStore } from '@/stores/LanguageStore.ts';
 import {
   Configuration,
-  GetMarketsGroupsMarketGroupIdXCompatibilityDateEnum,
   GetUniverseGroupsGroupIdAcceptLanguageEnum,
-  GetUniverseGroupsGroupIdXCompatibilityDateEnum,
   GetUniverseTypesTypeIdAcceptLanguageEnum,
   GetUniverseTypesTypeIdXCompatibilityDateEnum,
   MarketApi,
@@ -40,6 +38,7 @@ const { regionId, systemId, locationId } = defineProps({
 
 const universeApi = new UniverseApi(new Configuration(), undefined, axiosInstance);
 const marketApi = new MarketApi(new Configuration(), undefined, axiosInstance);
+const xCompatibilityDate = GetUniverseTypesTypeIdXCompatibilityDateEnum._20260721;
 const xTenant = 'tranquility';
 const langStore = useLanguageStore();
 
@@ -58,7 +57,7 @@ const refreshGasPrice = async (
       const data = await universeApi
         .getUniverseTypesTypeId(
           typeId,
-          GetUniverseTypesTypeIdXCompatibilityDateEnum._20260721,
+          xCompatibilityDate,
           locale as GetUniverseTypesTypeIdAcceptLanguageEnum,
           undefined,
           xTenant,
@@ -71,6 +70,7 @@ const refreshGasPrice = async (
       return data;
     }),
   );
+  const priceData = await aggregates(gasIds, locationId ?? systemId ?? regionId).catch(() => null);
   gases.value = await Promise.all(
     gasData.map(async (data) => {
       const typeId = data?.type_id ?? 0;
@@ -78,10 +78,7 @@ const refreshGasPrice = async (
       const marketGroup = data?.market_group_id ?? 0;
       if (marketGroup > 0) marketGroups.add(marketGroup);
 
-      const priceData = typeId
-        ? await stats(regionId, typeId, systemId, locationId).catch(() => null)
-        : null;
-      const unitPrice = priceData?.sellAvgFivePercent || 0;
+      const unitPrice = priceData?.[typeId.toString()]?.sell.percentile || 0;
 
       return {
         typeId,
@@ -101,7 +98,7 @@ onMounted(async () => {
   const response = await universeApi
     .getUniverseGroupsGroupId(
       gasCloudGroup,
-      GetUniverseGroupsGroupIdXCompatibilityDateEnum._20260721,
+      xCompatibilityDate,
       langStore.getShortLocale() as GetUniverseGroupsGroupIdAcceptLanguageEnum,
       undefined,
       xTenant,
@@ -152,7 +149,7 @@ const updateGasFilterOptions = async () => {
       const response = await marketApi
         .getMarketsGroupsMarketGroupId(
           marketGroupId,
-          GetMarketsGroupsMarketGroupIdXCompatibilityDateEnum._20260721,
+          xCompatibilityDate,
           langStore.getShortLocale() as GetUniverseGroupsGroupIdAcceptLanguageEnum,
           undefined,
           xTenant,
