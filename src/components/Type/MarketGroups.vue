@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { reactive, ref, watch, toRefs } from 'vue';
-import { NSkeleton, NBreadcrumb, NBreadcrumbItem, NPopover } from 'naive-ui';
 import {
   Configuration,
   GetMarketsGroupsMarketGroupIdAcceptLanguageEnum,
@@ -12,7 +11,7 @@ import {
 import { axiosInstance } from '@/api/esi';
 import { useLanguageStore } from '@/stores/LanguageStore';
 
-const xCompatibilityDate = GetMarketsGroupsMarketGroupIdXCompatibilityDateEnum._20260609;
+const xCompatibilityDate = GetMarketsGroupsMarketGroupIdXCompatibilityDateEnum._20260721;
 const xTenant = 'tranquility';
 const langStore = useLanguageStore();
 const loading = ref(true);
@@ -27,7 +26,7 @@ const groups = reactive<MarketsGroupsMarketGroupIdGet[]>([]);
 const api = new MarketApi(new Configuration(), undefined, axiosInstance);
 
 watch(
-  [()=>type.value.market_group_id, () => langStore.getShortLocale()],
+  [() => type.value.market_group_id, () => langStore.getShortLocale()],
   async ([newId, newLocale]) => {
     loading.value = true;
     if (newId) {

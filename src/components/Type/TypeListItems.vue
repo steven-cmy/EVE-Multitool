@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NSkeleton, NH2, NEllipsis, NThing, NListItem } from 'naive-ui';
 import TypeImage from '@/components/Type/TypeImage.vue';
 import {
   Configuration,
@@ -16,7 +15,7 @@ import {
 import { axiosInstance } from '@/api/esi';
 import { useLanguageStore } from '@/stores/LanguageStore';
 
-const xCompatibilityDate = GetUniverseTypesTypeIdXCompatibilityDateEnum._20260609;
+const xCompatibilityDate = GetUniverseTypesTypeIdXCompatibilityDateEnum._20260721;
 const xTenant = 'tranquility';
 const loading = ref(true);
 const api = new UniverseApi(new Configuration(), undefined, axiosInstance);

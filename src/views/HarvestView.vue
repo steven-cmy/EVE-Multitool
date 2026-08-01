@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import GasHarvest from '@/components/Harvest/GasHarvest.vue';
 import MarketOptions from '@/components/Harvest/MarketOptions.vue';
-
 </script>
 
 <template>

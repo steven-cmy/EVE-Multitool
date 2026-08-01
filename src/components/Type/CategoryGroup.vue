@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, toRefs, watch } from 'vue';
-import { NSkeleton, NBreadcrumb, NBreadcrumbItem, NIcon } from 'naive-ui';
 import {
   Configuration,
   GetUniverseCategoriesCategoryIdAcceptLanguageEnum,
@@ -15,7 +14,7 @@ import { axiosInstance } from '@/api/esi';
 import { useLanguageStore } from '@/stores/LanguageStore';
 import { Eye, EyeOff } from '@vicons/tabler';
 
-const xCompatibilityDate = GetUniverseCategoriesCategoryIdXCompatibilityDateEnum._20260609;
+const xCompatibilityDate = GetUniverseCategoriesCategoryIdXCompatibilityDateEnum._20260721;
 const xTenant = 'tranquility';
 const langStore = useLanguageStore();
 const loading = ref(true);

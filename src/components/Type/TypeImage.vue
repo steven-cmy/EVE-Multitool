@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { getImageUrl } from '@/api/eis';
-import { NImage } from 'naive-ui';
 
 const { typeid } = defineProps({
   typeid: {

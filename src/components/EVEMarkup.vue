@@ -13,7 +13,6 @@ const props = defineProps({
   },
 });
 
-
 const parsedContent = computed<string | undefined>(() => {
   if (!props.html) return undefined;
   const parser: DOMParser = new DOMParser();

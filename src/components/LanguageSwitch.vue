@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NIcon, NPopselect } from 'naive-ui';
 import { ref, watch } from 'vue';
 import { Language } from '@vicons/tabler';
 import { useLanguageStore } from '@/stores/LanguageStore';

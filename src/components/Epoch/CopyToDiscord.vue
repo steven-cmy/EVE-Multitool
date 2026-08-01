@@ -25,7 +25,6 @@
 </template>
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
-import { NButton, NFlex, NIcon, NPopover, NTime } from 'naive-ui';
 import { Code, Copy } from '@vicons/tabler';
 
 const now = ref<number>(Date.now());
