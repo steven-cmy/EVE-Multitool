@@ -97,39 +97,34 @@ const getCachedResponse = async (cacheKey: string, lang: string) => {
 };
 
 const cacheResponse = async (cacheKey: string, response: AxiosResponse) => {
-  const lang = response.headers['content-language'];
-  const cached = await getCachedResponse(cacheKey, lang);
+  const lang = String(response.headers['content-language'] ?? 'en');
   const esiResponse = {
     data: response.data,
     headers: {
       ...response.headers,
     },
   };
+
   try {
-    if (cached) {
-      // Update existing cache entry
+    const existing = await cache.get(cacheKey);
+    if (existing?.response) {
       log(`Updating cache for ${cacheKey} with language ${lang}`, esiResponse);
       await cache.update(cacheKey, (entry) => {
-        entry.response[lang] = esiResponse;
+        entry.response = {
+          ...entry.response,
+          [lang]: esiResponse,
+        };
       });
-    } else {
-      const q = await cache.get(cacheKey);
-      if (!q) {
-        log(`Creating new cache entry for ${cacheKey} with language ${lang}`, esiResponse);
-        await cache.put({
-          query: cacheKey,
-          response: {
-            [lang]: esiResponse,
-          },
-        });
-      } else {
-        // Add new language to existing cache entry
-        log(`Adding new language ${lang} to existing cache entry for ${cacheKey}`, esiResponse);
-        await cache.update(cacheKey, (entry) => {
-          entry.response[lang] = esiResponse;
-        });
-      }
+      return;
     }
+
+    log(`Creating new cache entry for ${cacheKey} with language ${lang}`, esiResponse);
+    await cache.put({
+      query: cacheKey,
+      response: {
+        [lang]: esiResponse,
+      },
+    });
   } catch (error) {
     console.warn('Cache write failed:', error);
   }
@@ -195,41 +190,51 @@ axiosInstance.interceptors.response.use(
     if (error.status === 304) {
       const response = error.response;
       const cacheKey = getQuery(response.config);
+      const lang = String(response.headers['content-language'] ?? 'en');
 
       updateErrorLimitState(response.headers);
 
-      let cached = null;
+      let cachedEntry = null;
       try {
-        cached = await cache.get(cacheKey);
+        cachedEntry = await cache.get(cacheKey);
       } catch (e) {
         console.warn('Cache read failed:', e);
-        Promise.reject({
+        return Promise.reject({
           ...error,
           message: `Cache read failed: ${e}`,
         });
       }
+
+      const cached = cachedEntry?.response?.[lang];
       if (cached) {
-        // Update expiration if provided in 304 response
         if (response.headers.expires) {
-          cached.headers.expires = response.headers.expires;
           try {
-            cache.update(cacheKey, (entry) => {
-              entry.headers.expires = new Date(response.headers.expires);
+            await cache.update(cacheKey, (entry) => {
+              entry.response = {
+                ...entry.response,
+                [lang]: {
+                  ...entry.response[lang],
+                  headers: {
+                    ...entry.response[lang]?.headers,
+                    expires: response.headers.expires,
+                  },
+                },
+              };
             });
-          } catch (error) {
-            console.warn('Cache update failed:', error);
+          } catch (updateError) {
+            console.warn('Cache update failed:', updateError);
           }
         }
         log('Cache HIT!(304)');
-        // Return cached data with 200 status
         return Promise.resolve({
           data: cached.data,
           status: 200,
           statusText: 'OK',
           headers: {
             ...cached.headers,
-            ...response.headers, // Merge any updated headers from 304 response
+            ...response.headers,
           },
+          config: response.config,
         });
       }
     }
