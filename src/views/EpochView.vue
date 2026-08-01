@@ -48,7 +48,6 @@
   </n-grid>
 </template>
 <script setup lang="ts">
-import { NButton, NDivider, NFlex, NGrid, NGridItem, NH1, NIcon, NSwitch, NTime } from 'naive-ui';
 import { Clock, Lock, LockOpen } from '@vicons/tabler';
 import TimeCard from '@/components/Epoch/TimeCard.vue';
 import TimeCalculator from '@/components/Epoch/TimeCalculator.vue';
@@ -85,7 +84,7 @@ const ts = ref<string>(now.value.toString());
 const timer = ref<number>();
 
 function goTo(time?: number) {
-  // locked.value = time !== undefined;
+  locked.value = time !== undefined;
   if (time) {
     ts.value = time.toString();
   }

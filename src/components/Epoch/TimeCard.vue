@@ -10,7 +10,6 @@
   </n-card>
 </template>
 <script setup lang="ts">
-import { NCard, NH2, NH3, NTime } from 'naive-ui';
 import { computed, ref, toRefs, watch } from 'vue';
 import { useLanguageStore } from '@/stores/LanguageStore';
 

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { NTabs, NTabPane } from 'naive-ui';
 import type { UniverseTypesTypeIdGet } from 'eve-esi-client-ts';
 import { toRefs } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -21,8 +20,7 @@ const { type } = toRefs(props);
     </n-tab-pane>
     <n-tab-pane name="raw" tab="RAW">
       {{ type }}
-      <hr>
-
+      <hr />
     </n-tab-pane>
   </n-tabs>
 </template>

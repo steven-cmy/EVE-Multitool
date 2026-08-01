@@ -1,27 +1,78 @@
 {
-    "languageName": "English",
-    "test": "Hello",
-    "types": {
-        "market": "Market",
-        "category": "Category",
-        "attributes": {
-            "description": "Description"
-        }
-    },
-    "epoch": {
-        "title": "Time",
-        "live": "Go to now",
-        "copyDiscord": "Copy Discord timestamp",
-        "UTC": "EVE Time/UTC",
-        "local": "Local Time",
-        "calc": {
-            "year": "Year(s)",
-            "month": "Month(s)",
-            "week": "Week(s)",
-            "day": "Day(s)",
-            "hour": "Hour(s)",
-            "minute": "Min(s)",
-            "second": "Sec(s)"
-        }
+  "languageName": "English",
+  "test": "Hello",
+  "types": {
+    "market": "Market",
+    "category": "Category",
+    "attributes": {
+      "description": "Description"
     }
+  },
+  "epoch": {
+    "title": "Time",
+    "live": "Go to now",
+    "copyDiscord": "Copy Discord timestamp",
+    "UTC": "EVE Time/UTC",
+    "local": "Local Time",
+    "calc": {
+      "year": "Year(s)",
+      "month": "Month(s)",
+      "week": "Week(s)",
+      "day": "Day(s)",
+      "hour": "Hour(s)",
+      "minute": "Min(s)",
+      "second": "Sec(s)"
+    }
+  },
+  "harvest": {
+    "title": "Harvest",
+    "showUnpublished": "Show Unpublished",
+    "hideUnpublished": "Hide Unpublished",
+    "gas": {
+      "gasType": "Gas Type",
+      "unitPrice": "Unit Price",
+      "volume": "Volume",
+      "pricePerVolume": "Price per Volume"
+    }
+  },
+  "rdf": {
+    "title": "RDF Calculator",
+    "rampancy": "Rampancy",
+    "location": {
+      "title": "Location",
+      "low": "C1/C2/C3",
+      "mid": "C4",
+      "high": "C5/C6"
+    },
+    "capital": {
+      "title": "Capital Usage",
+      "none": "No Capital",
+      "t1carrier": "T1 Carrier",
+      "other": "Other Capital"
+    },
+    "waves": "Waves",
+    "isk_per_ehp": "ISK/EHP",
+    "total_ehp": "Total EHP",
+    "total_loot": "Total Loot Value (excl. drones)",
+    "total_rdd": "Total RDD Drop",
+    "detail": "Details",
+    "wave_rdd": "Wave RDD Drop",
+    "peak_dps": "Peak DPS",
+    "wave_ehp": "Wave EHP",
+    "wave_loot": "Loot Value of last wave (excl. drones)",
+    "wave_clear_time": "Clear Time of last wave",
+    "total_clear_time": "Total Clear Time",
+    "focus_fire_efficiency": "Focus Fire Efficiency",
+    "isk_per_hour": "ISK/Hour",
+    "isk_per_tick": "ISK/Tick(20mins)",
+    "disclaimer": "Note: These data are calculated by average data that are collected from players. While we try to make it as accurate as possible, the actual data may vary due to different factors. Please use it as a reference only.",
+    "threat_tier": {
+      "title": "Threat Tier",
+      "NaN": "-",
+      "0": "Minimal",
+      "1": "Moderate",
+      "2": "Severe",
+      "3": "Critical"
+    }
+  }
 }

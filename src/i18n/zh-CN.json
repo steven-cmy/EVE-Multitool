@@ -1,27 +1,78 @@
 {
-    "languageName": "中文",
-    "test": "你好",
-    "types": {
-        "market": "市场",
-        "category": "分类",
-        "attributes": {
-            "description": "描述"
-        }
-    },
-    "epoch": {
-        "title": "时间",
-        "live": "现在时间",
-        "copyDiscord": "复制Discord时间戳",
-        "UTC": "EVE时间/UTC",
-        "local": "本地时间",
-        "calc": {
-            "year": "年",
-            "month": "月",
-            "week": "周",
-            "day": "日",
-            "hour": "小时",
-            "minute": "分钟",
-            "second": "秒"
-        }
+  "languageName": "中文",
+  "test": "你好",
+  "types": {
+    "market": "市场",
+    "category": "分类",
+    "attributes": {
+      "description": "描述"
     }
+  },
+  "epoch": {
+    "title": "时间",
+    "live": "现在时间",
+    "copyDiscord": "复制Discord时间戳",
+    "UTC": "EVE时间/UTC",
+    "local": "本地时间",
+    "calc": {
+      "year": "年",
+      "month": "月",
+      "week": "周",
+      "day": "日",
+      "hour": "小时",
+      "minute": "分钟",
+      "second": "秒"
+    }
+  },
+  "harvest": {
+    "title": "采集",
+    "showUnpublished": "显示未发布",
+    "hideUnpublished": "隐藏未发布",
+    "gas": {
+      "gasType": "气云种类",
+      "unitPrice": "单位价格",
+      "volume": "体积",
+      "pricePerVolume": "每体积价格"
+    }
+  },
+  "rdf": {
+    "title": "猖獗无人机",
+    "rampancy": "猖獗度",
+    "location": {
+      "title": "位置",
+      "low": "C1/C2/C3",
+      "mid": "C4",
+      "high": "C5/C6"
+    },
+    "capital": {
+      "title": "旗舰使用",
+      "none": "无旗舰",
+      "t1carrier": "T1航母",
+      "other": "其他旗舰"
+    },
+    "waves": "波次",
+    "isk_per_ehp": "ISK/EHP",
+    "total_ehp": "总EHP",
+    "total_loot": "总战利品价值（不含无人机）",
+    "total_rdd": "总橙书掉落",
+    "detail": "详情",
+    "wave_rdd": "当波橙书掉落",
+    "peak_dps": "峰值DPS",
+    "wave_ehp": "当波EHP",
+    "wave_loot": "最后一波战利品价值（不含无人机）",
+    "wave_clear_time": "最后一波需时",
+    "total_clear_time": "总需时",
+    "focus_fire_efficiency": "集火效率",
+    "isk_per_hour": "ISK/小时",
+    "isk_per_tick": "ISK/刻(20分钟)",
+    "disclaimer": "注意：这些数据是根据从玩家那里收集的平均数据计算得出的。尽管我们努力使其尽可能准确，但由于不同因素的影响，实际数据可能会有所变化。请仅将其作为参考使用。",
+    "threat_tier": {
+      "title": "威胁等级",
+      "NaN": "-",
+      "0": "最低",
+      "1": "中等",
+      "2": "严重",
+      "3": "危急"
+    }
+  }
 }

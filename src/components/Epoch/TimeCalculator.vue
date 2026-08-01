@@ -32,7 +32,6 @@
   </n-flex>
 </template>
 <script setup lang="ts">
-import { NButton, NButtonGroup, NForm, NFormItem, NIcon, NInputNumber } from 'naive-ui';
 import type { FormInst } from 'naive-ui';
 import { ref } from 'vue';
 import { Plus, Minus } from '@vicons/tabler';

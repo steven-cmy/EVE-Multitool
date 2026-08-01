@@ -12,7 +12,6 @@ import {
   GetUniverseTypesTypeIdXCompatibilityDateEnum,
   type UniverseTypesTypeIdGet,
 } from 'eve-esi-client-ts';
-import { NCard, NSkeleton, NThing, NH1 } from 'naive-ui';
 import { useLanguageStore } from '@/stores/LanguageStore';
 import { useRouter } from 'vue-router';
 import TypeAttributes from '@/components/Type/TypeAttributes.vue';
@@ -24,7 +23,7 @@ const { typeid } = defineProps({
 const loading = ref(true);
 const type = reactive<UniverseTypesTypeIdGet>({} as UniverseTypesTypeIdGet);
 const api = new UniverseApi(new Configuration(), undefined, axiosInstance);
-const xCompatibilityDate = GetUniverseTypesTypeIdXCompatibilityDateEnum._20260609;
+const xCompatibilityDate = GetUniverseTypesTypeIdXCompatibilityDateEnum._20260721;
 const xTenant = 'tranquility';
 const langStore = useLanguageStore();
 
@@ -80,10 +79,10 @@ watch(
           {{ type.type_id }}
         </template>
         <template #description>
-        <n-text>
-          <EVEMarkup :html="type.description" />
-        </n-text>
-      </template>
+          <n-text>
+            <EVEMarkup :html="type.description" />
+          </n-text>
+        </template>
         <TypeAttributes :type="type" />
       </n-thing>
     </n-card>
