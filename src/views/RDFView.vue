@@ -203,20 +203,27 @@
 </style>
 
 <script setup lang="ts">
+import { aggregate } from '@/api/fuzzwork/market';
 import type { NumberAnimationInst } from 'naive-ui';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import { useI18n } from 'vue-i18n';
 
 const numberAnimationInstRef = ref<NumberAnimationInst | null>(null);
 const { t } = useI18n();
 
-// const rampancy_data_dump_id = 91773;
+const rampancy_data_dump_id = 91773;
 const dps_per_dp = 135;
 const ehp_per_dp = 4200;
 const wave_interval = 20;
 const focus_fire_efficiency = ref(100);
-const rdd_price = ref(200000);
+const rdd_default_price = 200000;
+const rdd_price = ref<number>(rdd_default_price);
+
+const load_rdd_price = async () => {
+  const data = await aggregate(rampancy_data_dump_id);
+  rdd_price.value = data?.buy?.max ?? rdd_default_price;
+};
 
 const location_tier = [
   {
@@ -324,11 +331,8 @@ const total_clear_time = computed(() => {
     wave_interval * waves.value
   );
 });
-// watch([modifier, diff_points, waves], () => {
-//   const total_dp = diff_points.value * waves.value;
-//   total_dps.value = total_dp * dps_per_dp;
-//   total_ehp.value = total_dp * ehp_per_dp;
-//   total_rdd.value = FE.value * waves.value * (waves.value + 1);
-//   total_loot_value.value = total_rdd.value * rdd_price.value;
-// });
+
+onMounted(() => {
+  load_rdd_price();
+});
 </script>

@@ -66,7 +66,7 @@ export async function updatePrice(
   orderType: OrderType = OrderType.All,
   page?: number,
   typeId?: number,
-  acceptLanguage?: string,
+  acceptLanguage?: GetMarketsRegionIdOrdersAcceptLanguageEnum,
 ): Promise<boolean> {
   try {
     const response = await marketApi.getMarketsRegionIdOrders(
@@ -172,11 +172,9 @@ export async function getPrice(
   regionId: number,
   typeId: number,
   orderType: OrderType | string = OrderType.All,
-  lang?: string,
+  lang: string = 'en',
+  retry: boolean = true,
 ): Promise<ESIMarketStat | undefined> {
-  updatePrice(regionId, orderType as OrderType, 1, typeId, lang).catch((error) => {
-    console.error('updatePrice failed', error);
-  });
   const cached = await cache.get(typeId);
   if (cached && cached.expires > Date.now()) {
     if (orderType === OrderType.Sell) {
@@ -185,6 +183,18 @@ export async function getPrice(
       return cached.buy;
     }
     return cached;
+  }
+  if (retry) {
+    await updatePrice(
+      regionId,
+      orderType as OrderType,
+      1,
+      typeId,
+      lang as GetMarketsRegionIdOrdersAcceptLanguageEnum,
+    ).catch((error) => {
+      console.error('updatePrice failed', error);
+    });
+    return getPrice(regionId, typeId, orderType, lang, !retry);
   }
   return undefined;
 }

@@ -60,16 +60,12 @@ const parseAggregates = (
 
 export const aggregates = async (
   typeIds: number[],
-  regionLimit?: number,
+  regionId: number = 0, // Due to how it works, you can give a station or a system as a region, and it will return correctly.
 ): Promise<Record<string, FuzzworkMarketAggregates>> => {
   if (typeIds.length === 0) {
     throw new Error('At least one typeId is required to fetch aggregates.');
   }
-
-  const query = `${
-    regionLimit !== undefined ? `regionlimit=${regionLimit}` : ''
-  }&types=${typeIds.join(',')}`;
-
+  const query = `region=${regionId}&types=${typeIds.join(',')}`;
   try {
     const response = await axiosInstance.get<RawFuzzworkMarketAggregatesResponse>(
       `${endpoint}?${query}`,
@@ -84,8 +80,8 @@ export const aggregates = async (
 
 export const aggregate = async (
   typeId: number,
-  regionLimit?: number,
+  regionId: number = 0,
 ): Promise<FuzzworkMarketAggregates | undefined> => {
-  const response = await aggregates([typeId], regionLimit);
+  const response = await aggregates([typeId], regionId);
   return response[String(typeId)];
 };
