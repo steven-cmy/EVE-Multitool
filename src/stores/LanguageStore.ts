@@ -1,7 +1,13 @@
-import type { NDateLocale, NLocale } from 'naive-ui';
 import { defineStore } from 'pinia';
 import { useI18n } from 'vue-i18n';
-import * as naiveUI from 'naive-ui';
+import { enUS, zhCN, dateEnUS, dateZhCN, type NLocale, type NDateLocale } from 'naive-ui';
+
+const uiLocaleMap: Record<string, UILocale> = {
+  enUS: { locale: enUS, dateLocale: dateEnUS },
+  zhCN: { locale: zhCN, dateLocale: dateZhCN },
+  // 若 i18n 还启用了日文/韩文等，按此追加：
+  // jaJP: { locale: jaJP, dateLocale: dateJaJP },
+};
 
 type UILocale = {
   locale: NLocale;
@@ -26,8 +32,8 @@ export const useLanguageStore = defineStore('LanguageStore', () => {
   const getLocale = () => i18n.locale.value;
   const getShortLocale = () => short(i18n.locale.value);
   const getDenseLocale = () => dense(i18n.locale.value);
-  const getDateLocale = (loc: string = getDenseLocale()) =>
-    `date${loc.charAt(0).toUpperCase() + loc.slice(1)}`;
+  // const getDateLocale = (loc: string = getDenseLocale()) =>
+  //   `date${loc.charAt(0).toUpperCase() + loc.slice(1)}`;
 
   const availableLocales = () => {
     const { availableLocales } = i18n;
@@ -46,12 +52,8 @@ export const useLanguageStore = defineStore('LanguageStore', () => {
     const { availableLocales } = i18n;
     const locales: Record<string, UILocale> = {};
     availableLocales.forEach((loc) => {
-      locales[loc] = {
-        locale: (naiveUI[dense(loc) as keyof typeof naiveUI] as NLocale) ?? naiveUI['enUS'],
-        dateLocale:
-          (naiveUI[getDateLocale(dense(loc)) as keyof typeof naiveUI] as NDateLocale) ||
-          (naiveUI.dateEnUS as NDateLocale),
-      };
+      const key = dense(loc);
+      locales[loc] = (uiLocaleMap[key] ?? uiLocaleMap['enUS']) as UILocale;
     });
     return locales;
   };
