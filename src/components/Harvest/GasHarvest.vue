@@ -9,7 +9,8 @@
 
 <script setup lang="ts">
 import { axiosInstance } from '@/api/esi';
-import { aggregates } from '@/api/fuzzwork/market';
+import { getPrice, type ESIMarketStat } from '@/api/esi/market';
+// import { aggregates } from '@/api/fuzzwork/market';
 import i18n from '@/i18n';
 import { useLanguageStore } from '@/stores/LanguageStore.ts';
 import {
@@ -23,17 +24,21 @@ import {
 import type { DataTableBaseColumn, DataTableColumns, DataTableFilterState } from 'naive-ui';
 import { onMounted, reactive, ref, watch } from 'vue';
 
-const { regionId, systemId, locationId } = defineProps({
+const {
+  regionId,
+  // systemId,
+  // locationId
+} = defineProps({
   regionId: {
     type: Number,
     required: true,
   },
-  systemId: {
-    type: Number,
-  },
-  locationId: {
-    type: Number,
-  },
+  // systemId: {
+  //   type: Number,
+  // },
+  // locationId: {
+  //   type: Number,
+  // },
 });
 
 const universeApi = new UniverseApi(new Configuration(), undefined, axiosInstance);
@@ -70,7 +75,17 @@ const refreshGasPrice = async (
       return data;
     }),
   );
-  const priceData = await aggregates(gasIds, locationId ?? systemId ?? regionId).catch(() => null);
+  // const priceData = await aggregates(gasIds, locationId ?? systemId ?? regionId).catch(() => null);
+  const priceDataEntries = await Promise.all(
+    gasIds.map(
+      async (typeId) =>
+        [
+          typeId,
+          await getPrice(regionId, typeId, 'all', langStore.getShortLocale()).catch(() => null),
+        ] as const,
+    ),
+  );
+  const priceData = Object.fromEntries(priceDataEntries) as Record<number, ESIMarketStat>;
   gases.value = await Promise.all(
     gasData.map(async (data) => {
       const typeId = data?.type_id ?? 0;
@@ -78,7 +93,7 @@ const refreshGasPrice = async (
       const marketGroup = data?.market_group_id ?? 0;
       if (marketGroup > 0) marketGroups.add(marketGroup);
 
-      const unitPrice = priceData?.[typeId.toString()]?.sell.percentile || 0;
+      const unitPrice = priceData[typeId]?.buy.percentile ?? 0;
 
       return {
         typeId,
