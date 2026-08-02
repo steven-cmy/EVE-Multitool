@@ -1,64 +1,102 @@
 # EVE-Multitool
 
-This template should help get you started developing with Vue 3 in Vite.
+A multilingual Vue 3 + Vite frontend for EVE and gaming utilities, designed to support many languages and cover a wide range of gaming tools.
 
-## Recommended IDE Setup
+[简体中文](README.zh-CN.md)
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Deployment
 
-## Type Support for `.vue` Imports in TS
+### Build locally
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+```sh
+npm install
+npm run build
+```
 
-## Customize configuration
+### Run locally without Docker
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+```sh
+npm run preview
+```
 
-## Project Setup
+### Deploy with Docker
+
+This project includes a multi-stage Docker build and serves the production build with Nginx.
+
+1. Build the Docker image:
+
+```sh
+docker build -t eve-multitool .
+```
+
+2. Run a container:
+
+```sh
+docker run --rm -p 8080:80 eve-multitool
+```
+
+3. Open your browser at `http://localhost:8080`.
+
+If you want to rebuild after changing source files, run the build command again before rebuilding the Docker image.
+
+### Custom Nginx configuration
+
+The Docker image uses `nginx.conf` from the repository to configure static file serving.
+
+## Development
+
+### Recommended IDE setup
+
+- Visual Studio Code
+- Volar extension for Vue 3 support
+- Disable Vetur if installed
+
+### Install dependencies
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### Start development server
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+### Build for production
 
 ```sh
 npm run build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+### Type checking
+
+Use the Vue TypeScript checker for `.vue` imports:
+
+```sh
+npm run typecheck
+```
+
+### Linting
+
+```sh
+npm run lint
+```
+
+### Run tests
+
+#### Unit tests
 
 ```sh
 npm run test:unit
 ```
 
-### Run End-to-End Tests with [Playwright](https://playwright.dev)
+#### End-to-end tests
 
 ```sh
-# Install browsers for the first run
 npx playwright install
-
-# When testing on CI, must build the project first
 npm run build
-
-# Runs the end-to-end tests
 npm run test:e2e
-# Runs the tests only on Chromium
-npm run test:e2e -- --project=chromium
-# Runs the tests of a specific file
-npm run test:e2e -- tests/example.spec.ts
-# Runs the tests in debug mode
-npm run test:e2e -- --debug
 ```
 
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+For browser-specific or debug options, use the same flags supported by Playwright.
