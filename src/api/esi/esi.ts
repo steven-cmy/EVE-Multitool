@@ -225,7 +225,7 @@ axiosInstance.interceptors.response.use(
             console.warn('Cache update failed:', updateError);
           }
         }
-        log('Cache HIT!(304)');
+        log(`Cache HIT (304) for ${cacheKey} in ${lang}!`, cached);
         return Promise.resolve({
           data: cached.data,
           status: 200,
